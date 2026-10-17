@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Raliul Operațiilor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Baloo+2:wght@500;600;700;800&display=swap">
+<style>
+/* Concept: afiș de raliu de epocă — plăcuțe bordo cu anul, drum asfaltat, mașini cu flancuri albe; totul mare și rotund, pentru degete mici. */
+:root{
+  --bg:#e8eaee; --paper:#fbf9f4; --ink:#1d1f27; --muted:#5b5f6e; --line:#d5d8df;
+  --burgundy:#6b1f2b; --burgundy-2:#8c2c3b; --cream:#f1e4c9; --gold:#c69b4f; --gold-hi:#ecd296;
+  --road:#3a3e49; --grass:#9db58a; --sky:#dfe7ee;
+  --good:#2c8a57; --good-bg:#e1f3e8; --bad:#c2412f; --bad-bg:#fbe6e2; --info-bg:#fff4dc;
+  --f-display:"Alfa Slab One","Rockwell","Georgia",serif;
+  --f-body:"Baloo 2","Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+h1,h2,h3{margin:0;line-height:1.1;text-wrap:balance}
+p{margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* Bara de sus */
+.topbar{background:var(--burgundy);color:var(--cream);border-bottom:4px solid var(--gold)}
+.topbar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.logo{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;color:inherit}
+.logo .wheel-ic{width:34px;height:34px}
+.logo b{font-family:var(--f-display);font-size:21px;letter-spacing:.02em;font-weight:400}
+.spacer{flex:1}
+.iconbtn{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;border:2px solid rgba(241,228,201,.45);background:transparent;color:var(--cream)}
+.iconbtn:hover{background:rgba(255,255,255,.1)}
+.iconbtn svg{width:22px;height:22px}
+
+/* Butoane */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:10px 22px;border-radius:16px;border:3px solid var(--ink);background:var(--paper);font-weight:800;font-size:18px;box-shadow:0 4px 0 var(--ink);transition:transform .08s,box-shadow .08s;text-decoration:none;color:var(--ink)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn svg{width:22px;height:22px;flex:none}
+.btn-go{background:var(--gold);}
+.btn-red{background:var(--burgundy);color:var(--cream)}
+.btn-sm{min-height:42px;padding:6px 14px;font-size:16px;border-radius:12px;box-shadow:0 3px 0 var(--ink)}
+
+/* Plăcuța de an, ca în afișele de epocă */
+.plate{display:inline-flex;align-items:center;justify-content:center;background:var(--burgundy);color:#fff;font-family:var(--f-display);border-radius:10px;padding:4px 14px;box-shadow:inset 0 0 0 3px #c9ccd3,inset 0 0 0 5px var(--burgundy),0 2px 0 rgba(0,0,0,.25);letter-spacing:.03em}
+.plate.cream{background:var(--cream);color:var(--burgundy);box-shadow:inset 0 0 0 3px #c9ccd3,inset 0 0 0 5px var(--cream),0 2px 0 rgba(0,0,0,.2)}
+
+/* Acasă */
+.hero{padding-block:28px 10px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center}
+.hero h1{font-family:var(--f-display);font-weight:400;font-size:clamp(38px,6vw,64px);color:var(--burgundy);line-height:1}
+.hero h1 span{display:block;color:var(--ink);font-size:.58em;margin-top:6px}
+.hero .lead{font-size:19px;color:var(--muted);margin-top:14px;max-width:46ch}
+.hero .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.hero-car{position:relative}
+.hero-car .car{width:100%;height:auto;filter:drop-shadow(0 10px 10px rgba(0,0,0,.12))}
+.hero-car .road-strip{height:16px;background:repeating-linear-gradient(90deg,var(--road) 0 40px,#454a57 40px 80px);border-radius:8px;margin-top:-10px}
+@media (max-width:760px){.hero-grid{grid-template-columns:1fr}.hero-car{order:-1;max-width:420px;margin:0 auto;width:100%}}
+.section-h{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:26px 0 14px}
+.section-h h2{font-family:var(--f-display);font-weight:400;font-size:28px;color:var(--burgundy)}
+.seg{display:inline-flex;background:var(--paper);border:3px solid var(--ink);border-radius:14px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:8px 14px;font-weight:800;font-size:15px;min-height:44px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--cream)}
+.stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.stages{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.stages{grid-template-columns:1fr}}
+.stage{position:relative;text-align:left;display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:20px;background:var(--paper);border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);transition:transform .1s}
+.stage:hover{transform:translateY(-2px)}
+.stage:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.stage .top{display:flex;align-items:center;gap:10px}
+.stage .plate{font-size:20px}
+.stage h3{font-size:22px;font-weight:800}
+.stage p{color:var(--muted);font-size:15.5px;line-height:1.35}
+.stage .ex{font-weight:800;font-size:19px;letter-spacing:.02em;background:var(--bg);border-radius:10px;padding:6px 10px;align-self:flex-start;font-variant-numeric:tabular-nums}
+.stars{display:inline-flex;gap:3px}
+.stars svg{width:24px;height:24px}
+.cards2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:18px}
+@media (max-width:560px){.cards2{grid-template-columns:1fr}}
+.bigcard{display:flex;gap:14px;align-items:center;text-align:left;padding:16px;border-radius:20px;background:var(--cream);border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink)}
+.bigcard:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.bigcard .ic{width:62px;height:62px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--burgundy);color:var(--cream)}
+.bigcard .ic svg{width:32px;height:32px}
+.bigcard h3{font-size:21px;font-weight:800}
+.bigcard p{color:var(--muted);font-size:15.5px}
+.footer{padding-block:28px 36px;color:var(--muted);font-size:14px;text-align:center}
+
+/* Pista */
+.play{padding-block:14px 30px;display:flex;flex-direction:column;gap:14px}
+.playhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.playhead .title{display:flex;align-items:center;gap:10px;min-width:0}
+.playhead h2{font-size:22px;font-weight:800}
+.chipinfo{display:inline-flex;align-items:center;gap:6px;background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+@keyframes wave{50%{transform:skewY(6deg) scaleX(.94)}}
+.racer{position:absolute;width:var(--cw);transition:left .9s cubic-bezier(.3,.7,.3,1)}
+.racer .car{width:100%;height:auto;display:block}
+.calm .calm .car .spokes{transform-box:fill-box;transform-origin:center}
+.driving .car .spokes{animation:spin .35s linear infinite}
+.driving .car .bodyg{animation:bob .3s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bob{50%{transform:translateY(-1.2px)}}
+.puff{position:absolute;left:-8%;top:55%;width:18px;height:18px;border-radius:50%;background:rgba(200,200,205,.9);animation:puff .9s ease-out forwards}
+@keyframes puff{to{transform:translate(-30px,-16px) scale(2.2);opacity:0}}
+.sputter .car{animation:sput .5s}
+@keyframes sput{20%,60%{transform:translateX(-4px) rotate(-2deg)}40%,80%{transform:translateX(3px) rotate(1deg)}}
+
+/* Exercițiul */
+.board{background:var(--paper);border:3px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);padding:20px 18px 18px;display:flex;flex-direction:column;gap:16px;align-items:center}
+.prompt{font-weight:800;font-size:20px;text-align:center;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
+.prompt .step{background:var(--burgundy);color:var(--cream);border-radius:999px;font-size:14px;padding:2px 12px}
+.expr{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 5px;font-size:clamp(22px,5.8vw,54px);font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;min-height:1.6em;padding:6px 4px}
+.tk{display:inline-flex;align-items:center;justify-content:center}
+.tk.n{padding:0 2px}
+.tk.n.fresh{animation:pop .5s cubic-bezier(.2,1.6,.4,1);color:var(--good)}
+@keyframes pop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+.tk.br{font-family:var(--f-display);font-weight:400;font-size:1.05em;padding:0 1px}
+.tk.br.fade{animation:fade .45s forwards}
+@keyframes fade{to{opacity:0;transform:scale(1.6)}}
+button.op{min-width:1.3em;height:1.3em;min-height:40px;border-radius:.3em;border:3px solid var(--ink);background:var(--cream);font-weight:800;font-size:1em;line-height:1;padding:0 .12em;box-shadow:0 4px 0 var(--ink);transition:transform .08s,box-shadow .08s,background .15s}
+button.op:hover{background:var(--gold-hi)}
+button.op:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+button.op[disabled]{cursor:default;background:transparent;border-color:transparent;box-shadow:none}
+button.op.wrong{animation:shake .45s;background:var(--bad-bg);border-color:var(--bad)}
+button.op.hint{animation:glow 1s ease-in-out infinite;background:var(--gold-hi)}
+@keyframes glow{50%{box-shadow:0 4px 0 var(--ink),0 0 0 8px rgba(198,155,79,.45)}}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.selg{display:inline-flex;align-items:center;gap:5px;background:var(--gold-hi);border:3px dashed var(--burgundy);border-radius:16px;padding:2px 6px}
+.selg button.op{background:var(--burgundy);color:var(--cream)}
+.result-line{font-family:var(--f-display);font-weight:400;color:var(--good)}
+
+.answers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;width:100%;max-width:640px}
+@media (max-width:560px){.answers{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ans{min-height:72px;border-radius:18px;border:3px solid var(--ink);background:#fff;font-weight:800;font-size:32px;box-shadow:0 5px 0 var(--ink);font-variant-numeric:tabular-nums}
+.ans:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.ans.wrong{background:var(--bad-bg);border-color:var(--bad);animation:shake .45s;opacity:.6}
+.ans.right{background:var(--good-bg);border-color:var(--good)}
+.ans[disabled]{cursor:default}
+.tools{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.mech{display:flex;gap:12px;align-items:flex-start;width:100%;max-width:640px;padding:12px 14px;border-radius:16px;background:var(--info-bg);border:2px solid var(--gold)}
+.mech.bad{background:var(--bad-bg);border-color:var(--bad)}
+.mech.good{background:var(--good-bg);border-color:var(--good)}
+.mech .face{width:46px;height:46px;flex:none}
+.mech b{display:block;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.mech p{font-size:18px;font-weight:600}
+.dots{display:flex;gap:6px}
+.dots i{width:14px;height:14px;border-radius:50%;background:var(--line);border:2px solid var(--ink)}
+.dots i.done{background:var(--gold)}
+.dots i.cur{background:var(--burgundy)}
+
+/* Ferestre */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(20,22,30,.6);display:flex;align-items:center;justify-content:center;padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.dialog{background:var(--paper);border:4px solid var(--ink);border-radius:26px;box-shadow:0 8px 0 var(--ink);width:min(560px,100%);max-height:100%;overflow:auto;padding:22px;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;animation:rise .35s cubic-bezier(.2,1.3,.4,1)}
+@keyframes rise{from{transform:translateY(30px) scale(.95);opacity:0}}
+.dialog h2{font-family:var(--f-display);font-weight:400;font-size:34px;color:var(--burgundy)}
+.dialog .bigstars svg{width:58px;height:58px}
+.dialog .bigstars svg.on{animation:starpop .5s cubic-bezier(.2,1.6,.4,1) both}
+.dialog .bigstars svg:nth-child(2){animation-delay:.2s}.dialog .bigstars svg:nth-child(3){animation-delay:.4s}
+@keyframes starpop{from{transform:scale(0) rotate(-40deg)}}
+.stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.fact{display:flex;gap:12px;align-items:center;text-align:left;background:var(--cream);border-radius:16px;padding:12px 14px;border:2px solid var(--gold)}
+.fact .car{width:110px;flex:none;height:auto}
+.fact b{display:block;color:var(--burgundy);font-size:14px;text-transform:uppercase;letter-spacing:.06em}
+.dialog .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.unlock{font-weight:800;color:var(--good)}
+
+/* Reguli și garaj */
+.page{padding-block:20px 40px;display:flex;flex-direction:column;gap:18px}
+.page h1{font-family:var(--f-display);font-weight:400;font-size:clamp(30px,5vw,44px);color:var(--burgundy)}
+.rules{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:700px){.rules{grid-template-columns:1fr}}
+.rule{display:flex;gap:14px;align-items:flex-start;background:var(--paper);border:3px solid var(--ink);border-radius:20px;padding:16px;box-shadow:0 5px 0 var(--ink)}
+.sign{width:64px;height:64px;flex:none;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-size:24px;border:5px solid var(--bad);background:#fff;color:var(--ink)}
+.sign.blue{border-color:#2f6db0;background:#2f6db0;color:#fff}
+.sign.tri{border-radius:8px;border-color:var(--gold);background:var(--gold-hi)}
+.rule h3{font-size:21px;font-weight:800}
+.rule p{color:var(--muted);font-size:16px}
+.rule .ex{margin-top:6px;font-weight:800;font-size:18px}
+.demo{background:var(--paper);border:3px solid var(--ink);border-radius:24px;padding:18px;box-shadow:0 6px 0 var(--ink);display:flex;flex-direction:column;align-items:center;gap:12px}
+.demo .expr{font-size:clamp(26px,5.4vw,44px)}
+.demo .note{font-weight:700;font-size:18px;text-align:center;min-height:2.6em}
+.garage{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:640px){.garage{grid-template-columns:1fr}}
+.gcar{position:relative;background:var(--paper);border:3px solid var(--ink);border-radius:22px;padding:14px 16px;box-shadow:0 5px 0 var(--ink);display:flex;flex-direction:column;gap:8px}
+.gcar.sel{background:var(--cream);outline:4px solid var(--gold);outline-offset:-10px}
+.gcar .car{width:100%;height:auto}
+.gcar .lock{position:absolute;inset:0;border-radius:19px;background:rgba(232,234,238,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:800;text-align:center;padding:16px}
+.gcar .lock svg{width:40px;height:40px}
+.gcar h3{font-size:22px;font-weight:800;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.gcar p{color:var(--muted);font-size:15.5px}
+.specs{display:flex;flex-wrap:wrap;gap:6px}
+.specs span{background:var(--bg);border-radius:8px;padding:2px 8px;font-weight:700;font-size:14px}
+.confetti{position:fixed;top:-20px;width:10px;height:16px;z-index:60;pointer-events:none;animation:fall 2.4s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:70;background:var(--ink);color:var(--cream);padding:10px 18px;border-radius:999px;font-weight:700;box-shadow:0 8px 20px rgba(0,0,0,.25);max-width:calc(100vw - 32px);text-align:center;animation:rise .3s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.tk.br{color:#2f6db0}
+/* Pista cu benzi: una pentru fiecare jucător sau echipă */
+.track{--cw:min(112px,22%);position:relative;height:calc(52px + var(--lanes) * 62px);border-radius:20px;overflow:hidden;border:3px solid var(--ink);background:linear-gradient(180deg,var(--sky) 0 26px,var(--grass) 26px 38px,var(--road) 38px calc(100% - 10px),var(--grass) calc(100% - 10px))}
+.track .lane-line{position:absolute;left:0;right:0;height:3px;background:repeating-linear-gradient(90deg,#f1e4c9 0 26px,transparent 26px 52px);opacity:.7}
+.track .finish{position:absolute;top:38px;bottom:10px;right:5%;width:18px;background-image:linear-gradient(45deg,#111 25%,transparent 25%,transparent 75%,#111 75%),linear-gradient(45deg,#111 25%,transparent 25%,transparent 75%,#111 75%);background-color:#fff;background-size:12px 12px;background-position:0 0,6px 6px}
+.track .post{position:absolute;top:28px;width:6px;height:10px;background:var(--cream);border-radius:2px}
+.track .post.done{background:var(--gold)}
+.track .flagpole{position:absolute;right:calc(5% + 6px);top:4px;width:3px;height:34px;background:#222}
+.track .flag{position:absolute;right:calc(5% - 26px);top:4px;width:32px;height:20px;background-image:linear-gradient(45deg,#111 25%,transparent 25%,transparent 75%,#111 75%),linear-gradient(45deg,#111 25%,transparent 25%,transparent 75%,#111 75%);background-color:#fff;background-size:10px 10px;background-position:0 0,5px 5px;transform-origin:left center;animation:wave 1.6s ease-in-out infinite;border:1px solid #222}
+.racer{position:absolute;width:var(--cw);transition:left .9s cubic-bezier(.3,.7,.3,1)}
+#rival{transition:left .25s linear}
+.racer .tag{position:absolute;left:0;top:-16px;max-width:170%;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:800;background:var(--paper);border:2px solid var(--ink);border-radius:999px;padding:0 8px;white-space:nowrap;line-height:1.4}
+/* Setări pe pagina principală */
+.settings{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:flex-end;background:var(--paper);border:3px solid var(--ink);border-radius:20px;padding:14px 16px;box-shadow:0 5px 0 var(--ink);margin-top:16px}
+.setting,.field{display:flex;flex-direction:column;gap:6px}
+.lbl{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.seg{flex-wrap:wrap}
+.seg button{display:inline-flex;align-items:center;gap:6px}
+.seg button svg{width:20px;height:20px}
+.seg.big button{min-height:50px;font-size:16px;padding:8px 16px}
+.cards3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:18px}
+@media (max-width:860px){.cards3{grid-template-columns:1fr}}
+.footer{font-weight:600}
+/* Grupe */
+.dialog.wide{width:min(720px,100%)}
+.muted{color:var(--muted)}.small{font-size:14px}
+.names{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%}
+@media (max-width:560px){.names{grid-template-columns:1fr}}
+.namefield{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:14px;padding:6px 10px}
+.namefield .sw{width:70px;flex:none}.namefield .sw .car{width:100%;height:auto;display:block}
+.inp{width:100%;min-width:0;min-height:46px;border:3px solid var(--ink);border-radius:12px;padding:6px 12px;font:inherit;font-weight:700;font-size:17px;background:#fff;color:var(--ink)}
+textarea.inp{font-weight:600;font-size:16px;line-height:1.35;resize:vertical}
+.check{display:flex;gap:10px;align-items:flex-start;text-align:left;font-weight:600;font-size:16px;cursor:pointer}
+.check input{width:22px;height:22px;flex:none;margin-top:2px;accent-color:var(--burgundy)}
+.fl{display:flex;flex-direction:column;gap:6px;font-weight:800;font-size:14px;color:var(--muted)}
+.turn{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:700;background:var(--paper);border:3px solid var(--ink);border-radius:18px;padding:6px 16px;min-height:62px}
+.turn:empty{display:none}
+.turn .tcar{width:84px;flex:none}.turn .tcar .car{width:100%;height:auto;display:block}
+.turn-car{width:min(240px,70%)}.turn-car .car{width:100%;height:auto}
+.score{display:flex;flex-wrap:wrap;gap:8px}
+.sc{display:flex;align-items:center;gap:8px;background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:4px 12px 4px 8px;font-size:15px}
+.sc.cur{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent)}
+.sc .dot{width:14px;height:14px;border-radius:50%;background:var(--c);border:2px solid var(--ink)}
+.sc .pts{font-weight:800;font-variant-numeric:tabular-nums}
+.sc .lead{font-size:12px;font-weight:800;background:var(--gold-hi);border-radius:999px;padding:0 8px}
+.podium{list-style:none;margin:0;padding:0;width:100%;display:flex;flex-direction:column;gap:8px;text-align:left}
+.podium li{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:16px;padding:8px 12px;border:2px solid var(--line)}
+.podium li.p1{background:#fbefcf;border-color:var(--gold)}
+.podium .place{width:38px;height:38px;flex:none;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-size:20px;background:var(--burgundy);color:#fff}
+.podium li.p1 .place{background:var(--gold);color:var(--ink)}
+.podium .pc{width:76px;flex:none}.podium .pc .car{width:100%;height:auto;display:block}
+.podium .pn{flex:1;min-width:0;display:flex;flex-direction:column}.podium .pn b{font-size:18px;overflow-wrap:anywhere}.podium .pn small{color:var(--muted)}
+.podium .pp{font-weight:800;font-size:22px;font-variant-numeric:tabular-nums;white-space:nowrap}.podium .pp small{font-size:13px;color:var(--muted)}
+/* Roata alegerilor */
+.wheel-box{position:relative;width:min(440px,100%);margin:0 auto;aspect-ratio:1}
+.wheel-cv{width:100%;height:100%;display:block}
+.wheel-pointer{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid var(--burgundy);z-index:2;filter:drop-shadow(0 3px 0 var(--ink))}
+.wres{font-size:22px;font-weight:700;min-height:1.5em;text-align:center}
+.wres.big{font-size:clamp(24px,4vw,34px);font-family:var(--f-body)}
+.wres b{color:var(--burgundy)}
+.wheel-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){.wheel-layout{grid-template-columns:1fr}}
+.wheel-main{display:flex;flex-direction:column;gap:14px;background:var(--paper);border:3px solid var(--ink);border-radius:24px;padding:18px;box-shadow:0 6px 0 var(--ink)}
+.wheel-side{display:flex;flex-direction:column;gap:14px}
+.hist{margin:6px 0 0;padding-left:24px;font-weight:700;display:flex;flex-direction:column;gap:2px;max-height:220px;overflow:auto}
+.dialog .wheel-box{width:min(340px,100%)}
+
+.nf-in{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}.nf-in small{font-size:12.5px;color:var(--muted);line-height:1.25;text-align:left}
+.turn .mem{display:block;font-size:14px;color:var(--muted);font-weight:600}
+.memlist{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.memlist span{background:var(--bg);border:2px solid var(--line);border-radius:999px;padding:2px 12px;font-weight:700;font-size:15px;transition:background .1s}
+.memlist span.on{background:var(--gold-hi);border-color:var(--burgundy);transform:scale(1.08)}
+.groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.gcard{background:var(--paper);border:3px solid var(--ink);border-top:10px solid var(--c);border-radius:20px;padding:12px;box-shadow:0 5px 0 var(--ink);display:flex;flex-direction:column;gap:8px;cursor:default}
+.gh{display:flex;align-items:center;gap:8px}
+.gcar-sm{width:64px;flex:none}.gcar-sm .car{width:100%;height:auto;display:block}
+.gh .inp{min-height:40px;font-size:17px;padding:4px 10px}
+.gh .cnt{width:32px;height:32px;flex:none;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:800}
+.gcard ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.mem-b{width:100%;text-align:left;border:2px solid transparent;background:var(--bg);border-radius:10px;padding:5px 10px;font-weight:700;font-size:15.5px}
+.mem-b:hover{border-color:var(--line)}
+.mem-b.sel{background:var(--gold-hi);border-color:var(--burgundy)}
+.movehere{align-self:stretch;border-style:dashed}
+.empty-g{display:flex;gap:14px;align-items:center;background:var(--paper);border:3px dashed var(--line);border-radius:20px;padding:22px;font-size:18px;color:var(--muted)}
+.empty-g .ic{width:56px;height:56px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--burgundy);color:var(--cream)}.empty-g .ic svg{width:30px;height:30px}
+.cards3{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:640px){.cards3{grid-template-columns:1fr}}
+
+.draw-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;background:var(--burgundy);color:var(--cream);border:3px solid var(--ink);border-radius:20px;padding:14px 18px;box-shadow:0 5px 0 var(--ink);text-align:center}
+.draw-banner .lbl{color:var(--gold-hi);flex-basis:100%}
+.draw-banner b{font-size:clamp(24px,4.2vw,38px);font-weight:800;animation:pop .45s cubic-bezier(.2,1.6,.4,1)}
+.draw-banner .to{color:#fff;border-radius:999px;padding:4px 14px;font-weight:800;font-size:18px;border:2px solid var(--cream)}
+.draw-banner .btn{margin-left:auto}
+@media (max-width:560px){.draw-banner .btn{margin-left:0}}
+.mem-b.new{animation:pop .45s cubic-bezier(.2,1.6,.4,1);background:var(--gold-hi)}
+.gh .inp{font-size:18px;font-weight:800;color:var(--c)}
+.gcar-row{display:block;width:96px;margin:-2px auto 0}.gcar-row .car{width:100%;height:auto;display:block}
+.namefield{align-items:flex-start}
+.namefield.flash{animation:flash .5s}
+@keyframes flash{30%{background:var(--gold-hi)}}
+.gprev{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+.gp{background:var(--paper);border:2px solid var(--c);border-left-width:8px;border-radius:12px;padding:4px 12px;font-size:15px}
+.gp b{color:var(--c)}
+</style>
+
+<header class="topbar"><div class="wrap">
+  <button class="logo" id="home-btn" aria-label="Pagina principală"><svg class="wheel-ic" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#1d1f27"/><circle cx="20" cy="20" r="14" fill="#f1e4c9"/><circle cx="20" cy="20" r="11" fill="#3a3e49"/><g stroke="#d9dce2" stroke-width="1.6"><line x1="20" y1="10" x2="20" y2="30"/><line x1="10" y1="20" x2="30" y2="20"/><line x1="13" y1="13" x2="27" y2="27"/><line x1="27" y1="13" x2="13" y2="27"/></g><circle cx="20" cy="20" r="3.5" fill="#c69b4f"/></svg><b>Raliul Operațiilor</b></button>
+  <span class="spacer"></span>
+  <button class="iconbtn" id="mute-btn" aria-label="Sunet pornit"></button>
+</div></header>
+<main id="app"></main>
+
+
+<script>
+'use strict';
+/* ---------- Utilitare ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const fmt = v => String(v).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function store(v) { try { if (v === undefined) return JSON.parse(localStorage.getItem('raliu.v2')) || null; localStorage.setItem('raliu.v2', JSON.stringify(v)); } catch (_) { return null; } }
+
+/* ---------- Mașinile (desen original, vedere laterală) ---------- */
+const CARS = [
+  { id: 'duce', name: 'Ducele Bordo', year: 1931, type: 'sedan', body: '#6e1f2b', fender: '#1d1d24', roof: '#1d1d24', stripe: '#c69b4f', need: 0, specs: ['8 cilindri', '3 viteze', '160 km/h'], fact: 'Avea un motor cu 8 cilindri așezați în linie, unul după altul.' },
+  { id: 'crema', name: 'Crema Regală', year: 1934, type: 'conv', body: '#efe2c8', fender: '#6e1f2b', roof: '#d8c29b', stripe: '#6e1f2b', need: 3, specs: ['12 cilindri', 'decapotabilă', '160 km/h'], fact: 'Acoperișul de pânză se putea strânge, ca să mergi cu soarele în față.' },
+  { id: 'umbra', name: 'Umbra Nopții', year: 1930, type: 'sedan', body: '#22232b', fender: '#16161c', roof: '#16161c', stripe: '#c69b4f', need: 8, specs: ['16 cilindri', '2.600 kg', '145 km/h'], fact: 'Avea 16 cilindri! De 4 ori mai mulți decât o mașină obișnuită de azi: 16 : 4 = 4.' },
+  { id: 'rubin', name: 'Rubinul', year: 1932, type: 'conv', body: '#7a2030', fender: '#7a2030', roof: '#d8c29b', stripe: '#c69b4f', need: 12, specs: ['12 cilindri', 'coupé', '145 km/h'], fact: 'Roata de rezervă stătea la vedere, în aripa din față.' }
+];
+const RIVAL = { name: 'Baronul Verde', type: 'sedan', body: '#2f4f3e', fender: '#1d2a22', roof: '#1d2a22', stripe: '#c69b4f' };
+/* Mașinile echipelor: fiecare echipă are culoarea ei */
+const TEAM_CARS = [
+  { type: 'sedan', body: '#7a2030', fender: '#1d1d24', roof: '#1d1d24', stripe: '#c69b4f', chip: '#7a2030' },
+  { type: 'sedan', body: '#2b4f7e', fender: '#17202e', roof: '#17202e', stripe: '#e9d29a', chip: '#2b4f7e' },
+  { type: 'conv', body: '#efe2c8', fender: '#2f5a43', roof: '#d8c29b', stripe: '#2f5a43', chip: '#2f5a43' },
+  { type: 'sedan', body: '#c47f12', fender: '#2a2116', roof: '#2a2116', stripe: '#fff1cf', chip: '#b0700c' },
+  { type: 'conv', body: '#5a3a78', fender: '#2a1d38', roof: '#d8c29b', stripe: '#e9d29a', chip: '#5a3a78' },
+  { type: 'sedan', body: '#22232b', fender: '#16161c', roof: '#16161c', stripe: '#c69b4f', chip: '#22232b' },
+  { type: 'conv', body: '#1f6f73', fender: '#123f42', roof: '#d8c29b', stripe: '#e9d29a', chip: '#1f6f73' },
+  { type: 'sedan', body: '#b23a2a', fender: '#2a1714', roof: '#2a1714', stripe: '#f1e4c9', chip: '#b23a2a' },
+  { type: 'conv', body: '#8a8f99', fender: '#2b2e35', roof: '#d8c29b', stripe: '#1d1f27', chip: '#5f6470' },
+  { type: 'sedan', body: '#3f7a2e', fender: '#1d2a17', roof: '#1d2a17', stripe: '#ecd296', chip: '#3f7a2e' }
+];
+const MAX_TEAMS = TEAM_CARS.length;
+const TEAM_NAMES = ['Mercedes-Benz', 'BMW', 'Audi', 'Porsche', 'Ferrari', 'Lamborghini', 'Rolls-Royce', 'Bentley', 'Range Rover', 'Tesla'];
+function shade(hex, amt) { const n = parseInt(hex.slice(1), 16); const c = k => Math.max(0, Math.min(255, ((n >> k) & 255) + amt)); return '#' + ((1 << 24) + (c(16) << 16) + (c(8) << 8) + c(0)).toString(16).slice(1); }
+let _cid = 0;
+function wheel(cx, cy) {
+  let sp = ''; for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; sp += `<line x1="${cx}" y1="${cy}" x2="${(cx + Math.cos(a) * 10).toFixed(1)}" y2="${(cy + Math.sin(a) * 10).toFixed(1)}"/>`; }
+  return `<circle cx="${cx}" cy="${cy}" r="17" fill="#17171b"/><circle cx="${cx}" cy="${cy}" r="14" fill="#f6f3ec"/><circle cx="${cx}" cy="${cy}" r="11" fill="#2b2c33"/><g class="spokes" stroke="#d3d7de" stroke-width="1.1">${sp}<circle cx="${cx}" cy="${cy}" r="10.5" fill="none" stroke="#e8ebef" stroke-width="1.4"/><circle cx="${cx}" cy="${cy}" r="3.4" fill="#b8322f" stroke="#e8ebef" stroke-width="1"/></g>`;
+}
+function carSVG(c, label = '') {
+  const u = 'c' + (++_cid); const conv = c.type === 'conv';
+  const lv = [152, 160, 168, 176, 184, 192, 200].map(x => `<line x1="${x}" y1="61" x2="${x}" y2="73"/>`).join('');
+  const cabin = conv
+    ? `<path d="M56,51 L58,31 Q60,20 74,20 L106,20 Q117,20 120,30 L124,51 Z" fill="${c.roof}"/><path d="M66,22 L66,50 M80,20 L80,50 M94,20 L94,50" stroke="${shade(c.roof, -22)}" stroke-width="1"/>
+       <path d="M96,28 L114,28 Q117,28 118,32 L120,46 L96,46 Z" fill="url(#${u}g)"/>
+       <path d="M124,51 L133,24" stroke="url(#${u}m)" stroke-width="3.2" stroke-linecap="round"/><path d="M125,50 L132,27 L135,28 L129,50 Z" fill="#cfe0ea" opacity=".75"/>`
+    : `<path d="M42,52 L46,24 Q48,14 60,14 L118,14 Q128,14 131,22 L138,52 Z" fill="${c.roof}"/>
+       <rect x="52" y="22" width="32" height="24" rx="4" fill="url(#${u}g)" stroke="#d9dde3" stroke-width="1.2"/>
+       <path d="M90,22 L123,22 Q126,22 127,25 L131,46 L90,46 Z" fill="url(#${u}g)" stroke="#d9dde3" stroke-width="1.2"/>`;
+  return `<svg class="car" viewBox="0 0 260 120" role="img" aria-label="${esc(label || c.name || 'mașină de epocă')}">
+  <defs><linearGradient id="${u}m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#a9afba"/><stop offset="1" stop-color="#eef0f3"/></linearGradient>
+  <linearGradient id="${u}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(c.body, 22)}"/><stop offset=".55" stop-color="${c.body}"/><stop offset="1" stop-color="${shade(c.body, -30)}"/></linearGradient>
+  <linearGradient id="${u}g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e3eef4"/><stop offset="1" stop-color="#9fb6c4"/></linearGradient></defs>
+  <ellipse cx="132" cy="111" rx="114" ry="6" fill="rgba(0,0,0,.2)"/>
+  ${wheel(64, 92)}${wheel(200, 92)}
+  <g class="bodyg">
+  <rect x="19" y="56" width="17" height="25" rx="5" fill="${c.fender}"/>
+  ${cabin}
+  <path d="M30,68 Q28,51 46,50 L132,50 L216,54 L221,85 L40,87 Q30,85 30,68 Z" fill="url(#${u}b)"/>
+  <g stroke="${shade(c.body, -40)}" stroke-width="1.6" stroke-linecap="round">${lv}</g>
+  <path d="M34,62 L214,60" stroke="${c.stripe}" stroke-width="1.6" fill="none"/>
+  <rect x="96" y="56" width="9" height="2.4" rx="1" fill="url(#${u}m)"/>
+  <path fill-rule="evenodd" fill="${c.fender}" d="M30,97 C30,53 98,53 98,97 Z M84,92 A20,20 0 1,0 44,92 A20,20 0 1,0 84,92 Z"/>
+  <path fill-rule="evenodd" fill="${c.fender}" d="M134,97 C150,96 164,58 200,57 C225,57 237,76 239,97 Z M220,92 A20,20 0 1,0 180,92 A20,20 0 1,0 220,92 Z"/>
+  <rect x="94" y="92" width="44" height="5" rx="1.5" fill="#26262c"/><rect x="94" y="91" width="44" height="1.6" fill="url(#${u}m)"/>
+  <circle cx="153" cy="73" r="15" fill="#17171b"/><circle cx="153" cy="73" r="11.5" fill="#f6f3ec"/><circle cx="153" cy="73" r="8.5" fill="${c.fender === c.body ? shade(c.body, -25) : c.fender}"/><circle cx="153" cy="73" r="3" fill="url(#${u}m)"/>
+  <rect x="213" y="45" width="12" height="38" rx="4" fill="url(#${u}m)"/><g stroke="#878d99" stroke-width="1"><line x1="216" y1="48" x2="216" y2="80"/><line x1="219" y1="48" x2="219" y2="80"/><line x1="222" y1="48" x2="222" y2="80"/></g>
+  <path d="M216,45 L219,36 L224,40 L222,45 Z" fill="url(#${u}m)"/>
+  <line x1="226" y1="74" x2="231" y2="66" stroke="#6d717c" stroke-width="2"/>
+  <circle cx="233" cy="60" r="9.5" fill="url(#${u}m)"/><circle cx="233" cy="60" r="6.6" fill="#fff4cc"/><circle cx="231" cy="58" r="2" fill="#fff"/>
+  <circle cx="229" cy="78" r="4.2" fill="url(#${u}m)"/><circle cx="229" cy="78" r="2.6" fill="#fff4cc"/>
+  <rect x="223" y="88" width="26" height="4.5" rx="2.2" fill="url(#${u}m)"/><rect x="11" y="83" width="21" height="4.5" rx="2.2" fill="url(#${u}m)"/>
+  </g></svg>`;
+}
+const STAR = on => `<svg viewBox="0 0 24 24" class="${on ? 'on' : ''}" aria-hidden="true"><path d="M12 2.6l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.2l-5.9 3.2 1.3-6.5L2.5 9.4l6.6-.8z" fill="${on ? '#e3b341' : '#d5d8df'}" stroke="#1d1f27" stroke-width="1.4" stroke-linejoin="round"/></svg>`;
+const ICON = {
+  sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>',
+  mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M9 7h6M9 11h6"/></svg>',
+  garage: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M7 21v-8h10v8M7 16h10"/></svg>',
+  bulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>',
+  redo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7L20 8"/><path d="M20 3v5h-5"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  wheel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 3v7M12 14v7M3 12h7M14 12h7M5.6 5.6l5 5M13.4 13.4l5 5M18.4 5.6l-5 5M10.6 13.4l-5 5"/></svg>',
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+  pair: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="8" cy="8" r="3.4"/><circle cx="16.5" cy="8" r="3.4"/><path d="M2 20a6 6 0 0 1 12 0M10 20a6.5 6.5 0 0 1 12 0"/></svg>',
+  group: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="7" r="3"/><circle cx="5" cy="10" r="2.5"/><circle cx="19" cy="10" r="2.5"/><path d="M6.5 21a5.5 5.5 0 0 1 11 0M1 19a4 4 0 0 1 5.5-3.7M23 19a4 4 0 0 0-5.5-3.7"/></svg>',
+  trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H4a3 3 0 0 0 4 4M16 6h4a3 3 0 0 1-4 4M12 13v4M8 21h8M9 17h6v4H9z"/></svg>'
+};
+const MECH = `<svg class="face" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="26" r="17" fill="#f2c9a0" stroke="#1d1f27" stroke-width="2"/><path d="M7 21c2-10 10-14 17-14s15 4 17 14z" fill="#6b1f2b" stroke="#1d1f27" stroke-width="2"/><rect x="6" y="19" width="36" height="5" rx="2.5" fill="#1d1f27"/><circle cx="18" cy="28" r="2.2" fill="#1d1f27"/><circle cx="30" cy="28" r="2.2" fill="#1d1f27"/><path d="M17 35q7 5 14 0" stroke="#1d1f27" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>`;
+
+/* ---------- Motorul de calcul (doar paranteze rotunde) ---------- */
+let _tid = 0; const T = (k, v) => ({ k, v, id: ++_tid });
+const isOp = t => t.k === 'o';
+const isMD = v => v === '×' || v === ':';
+function groups(tk) { // grupurile din paranteze; dacă nu sunt paranteze, tot exercițiul
+  const st = [], out = [];
+  tk.forEach((t, i) => { if (t.k === '(') { if (st.length) st[st.length - 1].child = true; st.push({ i, child: false }); } else if (t.k === ')') { const o = st.pop(); if (!o.child) out.push([o.i, i]); } });
+  return out.length ? out : [[-1, tk.length]];
+}
+function nextOps(tk) {
+  const res = [];
+  for (const [a, b] of groups(tk)) {
+    const ops = []; for (let i = a + 1; i < b; i++) if (isOp(tk[i])) ops.push(i);
+    if (ops.length) res.push(ops.find(i => isMD(tk[i].v)) ?? ops[0]);
+  }
+  return res;
+}
+function calc(a, op, b) {
+  if (op === '+') return a + b; if (op === '−') return a - b; if (op === '×') return a * b;
+  if (op === ':') return b !== 0 && a % b === 0 ? a / b : NaN; return NaN;
+}
+function applyOp(tk, i) { const n = T('n', calc(tk[i - 1].v, tk[i].v, tk[i + 1].v)); n.fresh = true; tk.splice(i - 1, 3, n); return n; }
+function collapsible(tk) { const r = []; for (let i = 0; i + 2 < tk.length; i++) if (tk[i].k === '(' && tk[i + 1].k === 'n' && tk[i + 2].k === ')') r.push(i); return r; }
+function collapse(tk) { let c; while ((c = collapsible(tk)).length) tk.splice(c[0], 3, tk[c[0] + 1]); }
+function exprText(tk) { return tk.map(t => t.k === 'n' ? fmt(t.v) : t.k === 'o' ? ` ${t.v} ` : t.k).join('').replace(/\s+/g, ' ').trim(); }
+const cloneTk = tk => tk.map(t => ({ ...t }));
+function whyWrong(tk, i) {
+  const g = groups(tk).find(([a, b]) => i > a && i < b);
+  if (!g) return tk.some(t => t.k === '(') ? 'Stop! Întâi rezolvăm ce este în paranteze.' : 'Încearcă altă operație.';
+  const ops = []; for (let j = g[0] + 1; j < g[1]; j++) if (isOp(tk[j])) ops.push(j);
+  if (!isMD(tk[i].v) && ops.some(j => isMD(tk[j].v))) return 'Înmulțirea (×) și împărțirea (:) trec primele, ca mașinile pe banda rapidă. Abia apoi adunarea și scăderea.';
+  return 'Când operațiile sunt la fel de importante, mergem de la stânga la dreapta, ca atunci când citim.';
+}
+
+/* ---------- Etapele ---------- */
+const LEVELS = [
+  { name: 'Drum drept', desc: 'Adunări și scăderi. Mergi de la stânga la dreapta.', ex: { 100: '45 − 18 + 26', 1000: '640 − 285 + 130', 10000: '6.400 − 2.850 + 1.300' }, n: 3, ops: ['+', '−'], br: 0, sec: 14 },
+  { name: 'Banda rapidă', desc: 'Înmulțirea și împărțirea se fac înaintea adunării și scăderii.', ex: { 100: '30 + 6 × 7', 1000: '350 + 125 × 4', 10000: '3.500 + 1.250 × 4' }, n: 3, ops: ['+', '−', '×', ':'], br: 0, sec: 16, need: 'mix' },
+  { name: 'Curbe strânse', desc: 'Patru numere: ×, :, + și − în același exercițiu.', ex: { 100: '80 − 36 : 4 × 3', 1000: '900 − 360 : 4 × 3', 10000: '9.000 − 3.600 : 4 × 3' }, n: 4, ops: ['+', '−', '×', ':'], br: 0, sec: 18, need: 'mix' },
+  { name: 'Garajul ( )', desc: 'Ce este în paranteze se face primul.', ex: { 100: '(16 + 8) × 3', 1000: '(160 + 85) × 4', 10000: '(1.600 + 850) × 4' }, n: 3, ops: ['+', '−', '×', ':'], br: 1, sec: 16 },
+  { name: 'Paranteza și banda rapidă', desc: 'O paranteză și încă o înmulțire sau împărțire.', ex: { 100: '50 − (12 + 8) : 4', 1000: '500 − (120 + 80) : 4', 10000: '5.000 − (1.200 + 800) : 4' }, n: 4, ops: ['+', '−', '×', ':'], br: 1, sec: 19 },
+  { name: 'Marele Premiu', desc: 'Două paranteze în același exercițiu.', ex: { 100: '(30 − 6) : 4 + (5 + 7)', 1000: '(300 − 60) : 4 + (50 + 70)', 10000: '(3.000 − 600) : 4 + (500 + 700)' }, n: 5, ops: ['+', '−', '×', ':'], br: 2, sec: 20 }
+];
+const RANGES = { 100: { lo: 2, hi: 99, mulBig: [2, 12], q: [2, 12] }, 1000: { lo: 10, hi: 999, mulBig: [11, 250], q: [10, 125] }, 10000: { lo: 100, hi: 9999, mulBig: [101, 2500], q: [100, 1250] } };
+function genOnce(L, R) {
+  const C = RANGES[R]; const n = L.n; const ops = [];
+  for (let i = 0; i < n - 1; i++) ops.push(pick(L.ops));
+  const hasMD = ops.some(isMD), hasAS = ops.some(o => !isMD(o));
+  if (L.need === 'mix' && (!hasMD || !hasAS)) return null;
+  if (L.br && !hasMD) return null;
+  if (ops.filter(isMD).length > 2) return null;
+  const nums = ops.length ? Array.from({ length: n }, () => rnd(C.lo, Math.round(C.hi * .7))) : [];
+  ops.forEach((o, i) => {
+    if (o === '×') { const small = rnd(2, 9), big = rnd(C.mulBig[0], C.mulBig[1]); if (Math.random() < .5) { nums[i] = big; nums[i + 1] = small; } else { nums[i] = small; nums[i + 1] = big; } }
+  });
+  ops.forEach((o, i) => { if (o === ':') { nums[i + 1] = rnd(2, 9); nums[i] = nums[i + 1] * rnd(C.q[0], C.q[1]); } });
+  if (nums.some(v => v < 1 || v > R)) return null;
+  // parantezele (doar rotunde): în jurul unei adunări/scăderi care stă lângă × sau :
+  const spans = [];
+  if (L.br) {
+    const cand = ops.map((o, i) => i).filter(i => !isMD(ops[i]) && (isMD(ops[i - 1] || '') || isMD(ops[i + 1] || '')));
+    if (!cand.length) return null;
+    const j = pick(cand); spans.push([j, j + 1]);
+    if (L.br === 2) { const c2 = ops.map((o, i) => i).filter(i => (i >= j + 2 || i <= j - 2) && !isMD(ops[i])); if (!c2.length) return null; const k = pick(c2); spans.push([k, k + 1]); }
+  }
+  const tk = [];
+  for (let i = 0; i < n; i++) {
+    if (spans.some(s => s[0] === i)) tk.push(T('('));
+    tk.push(T('n', nums[i]));
+    if (spans.some(s => s[1] === i)) tk.push(T(')'));
+    if (i < n - 1) tk.push(T('o', ops[i]));
+  }
+  const sim = cloneTk(tk); let steps = 0;
+  while (sim.length > 1) {
+    const i = nextOps(sim)[0]; if (i === undefined) return null;
+    const v = calc(sim[i - 1].v, sim[i].v, sim[i + 1].v);
+    if (!Number.isInteger(v) || v < 0 || v > R) return null;
+    if (sim[i].v === ':' && sim[i + 1].v === 1) return null;
+    if (sim[i].v === '×' && (sim[i - 1].v === 1 || sim[i + 1].v === 1)) return null;
+    applyOp(sim, i); collapse(sim); steps++;
+  }
+  if (sim[0].v === 0 && Math.random() < .8) return null;
+  return { tk, steps, result: sim[0].v };
+}
+function gen(L, R = S.range) { for (let k = 0; k < 40000; k++) { const r = genOnce(L, R); if (r) return r; } const tk = [T('n', 20), T('o', '+'), T('n', 3), T('o', '×'), T('n', 4)]; return { tk, steps: 2, result: 32 }; }
+function options(a, op, b, c) {
+  const s = new Set(); const add = v => { if (Number.isInteger(v) && v >= 0 && v !== c && v <= 20000) s.add(v); };
+  const big = c >= 1000 ? [1000, 100, 10] : c >= 100 ? [100, 10, 1] : [10, 1, 2];
+  if (op === '×') add(c + Math.max(a, b)), add(c - Math.max(a, b));
+  if (op === ':') add(c + 1), add(c - 1);
+  const wrongOp = op === '+' ? a - b : op === '−' ? a + b : op === '×' ? a + b : a - b; if (Math.random() < .5) add(wrongOp);
+  shuffle(big.flatMap(d => [c + d, c - d])).forEach(add);
+  return shuffle([c, ...shuffle([...s]).slice(0, 3)]);
+}
+function calcTip(a, op, b) {
+  if (op === '×') return a >= 100 || b >= 100 ? `Înmulțește pe rând unitățile, zecile, sutele${Math.max(a, b) >= 1000 ? ' și miile' : ''} cu ${Math.min(a, b)}.` : `${fmt(a)} × ${fmt(b)} înseamnă ${fmt(b)} luat de ${fmt(a)} ori.`;
+  if (op === ':') return `Ce număr înmulțit cu ${fmt(b)} dă ${fmt(a)}?`;
+  if (op === '−') return a >= 100 ? 'Scade pe rând: unitățile, zecile, sutele, apoi miile. Atenție la împrumut!' : `Pornește de la ${fmt(a)} și numără înapoi ${fmt(b)}.`;
+  return a >= 100 ? 'Adună pe rând unitățile, zecile, sutele și miile. Atenție la trecerea peste ordin!' : `Pornește de la ${fmt(a)} și mai adaugă ${fmt(b)}.`;
+}
+
+/* ---------- Starea ---------- */
+const DEFAULT_STUDENTS = `Antonescu Elena Cosmina
+Badea David Mihai
+Burada Sofia Antonia
+Ciobotea Eric Andrei
+Dincă Erik Gabriel
+Dobre Jasmine Maria
+Dochiță Alexandra Ioana
+Dumitrescu Antonia Andreea
+Ferecatu Ada Sofia
+Ganea Evelin Elena
+Istrate Matei Ioan
+Marica Sofia Ioana
+Moraru Darius Ștefan
+Moraru Matei Bogdan
+Negoiță Natalia Maria
+Nisipeanu Anais Maria
+Olaru Erik Andrei
+Panait Maria Cristina
+Pană Daria Elena
+Preda Matteo Ștefan
+Pricope Anamaria
+Pușcașu Andrei Costin
+Scheianu Rebecca Elena
+Sosula Yeva
+Șurpănelu Alexandru Bogdan Erik
+Teletin Dominic Oliver
+Ungureanu Sara Valentina`;
+const S = Object.assign({ stars: {}, car: 'duce', mute: false, mode: 'race', range: 10000, play: 'solo', teams: TEAM_NAMES.slice(0, 4), pair: ['Jucătorul 1', 'Jucătorul 2'], rounds: 3, useWheel: true, students: DEFAULT_STUDENTS, wheelPreset: 'students', groups: [], useGroups: false, groupSize: 5 }, store() || {});
+if (!S.students || !S.students.trim()) S.students = DEFAULT_STUDENTS;
+{ const OLD = ['Șoimii', 'Delfinii', 'Vulturii', 'Albinele', 'Bufnițele', 'Leii', 'Vulpițele', 'Castorii'];
+  S.teams = S.teams.map((t, i) => OLD.includes(t) ? TEAM_NAMES[i] : t); (S.groups || []).forEach((g, i) => { if (OLD.includes(g.name)) g.name = TEAM_NAMES[i]; }); }
+const save = () => store({ stars: S.stars, car: S.car, mute: S.mute, mode: S.mode, range: S.range, play: S.play, teams: S.teams, pair: S.pair, rounds: S.rounds, useWheel: S.useWheel, students: S.students, groups: S.groups, useGroups: S.useGroups, groupSize: S.groupSize, wheelPreset: S.wheelPreset });
+const starKey = li => li + '@' + S.range;
+const totalStars = () => Object.values(S.stars).reduce((a, b) => a + b, 0);
+const myCar = () => CARS.find(c => c.id === S.car) || CARS[0];
+
+/* ---------- Sunete ---------- */
+let AC = null;
+function tone(f, d = .12, type = 'sine', vol = .12, when = 0, slide = 0) {
+  if (S.mute) return; try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume();
+    const t = AC.currentTime + when; const o = AC.createOscillator(); const g = AC.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.linearRampToValueAtTime(f + slide, t + d);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g).connect(AC.destination); o.start(t); o.stop(t + d + .02);
+  } catch (_) {}
+}
+const SND = {
+  ok: () => { tone(660, .12, 'triangle', .14); tone(880, .18, 'triangle', .14, .1); },
+  pick: () => tone(520, .08, 'square', .05),
+  tick: () => tone(1200, .03, 'square', .03),
+  bad: () => { tone(180, .22, 'sawtooth', .07); tone(150, .25, 'sawtooth', .06, .08); },
+  horn: () => { tone(330, .28, 'sawtooth', .08, 0, -90); tone(300, .45, 'sawtooth', .08, .3, 120); },
+  win: () => [523, 659, 784, 1046].forEach((f, i) => tone(f, .25, 'triangle', .13, i * .13))
+};
+function setMuteIcon() { const b = $('#mute-btn'); b.innerHTML = S.mute ? ICON.mute : ICON.sound; b.setAttribute('aria-label', S.mute ? 'Sunet oprit' : 'Sunet pornit'); }
+$('#mute-btn').onclick = () => { S.mute = !S.mute; save(); setMuteIcon(); if (!S.mute) SND.ok(); };
+$('#home-btn').onclick = () => go('home');
+setMuteIcon();
+function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2800); }
+function confetti() { if (reduced) return; const cols = ['#6b1f2b', '#c69b4f', '#f1e4c9', '#2f6db0', '#2c8a57']; for (let i = 0; i < 46; i++) { const c = document.createElement('i'); c.className = 'confetti'; c.style.left = Math.random() * 100 + 'vw'; c.style.background = cols[i % cols.length]; c.style.animationDelay = Math.random() * .6 + 's'; c.style.animationDuration = 1.8 + Math.random() * 1.4 + 's'; document.body.appendChild(c); setTimeout(() => c.remove(), 3600); } }
+function overlay(html, cls = '') { const ov = document.createElement('div'); ov.className = 'overlay'; ov.innerHTML = `<div class="dialog ${cls}" role="dialog" aria-modal="true">${html}</div>`; document.body.appendChild(ov); return ov; }
+
+/* ---------- Roata alegerilor (componentă) ---------- */
+const WHEEL_COLORS = ['#6b1f2b', '#c69b4f', '#2b4f7e', '#2f5a43', '#efe2c8', '#5a3a78', '#c47f12', '#22232b'];
+function makeWheel(canvas, items) {
+  const ctx = canvas.getContext('2d'); let rot = 0; let spinning = false; let list = items.slice();
+  const size = () => { const r = canvas.getBoundingClientRect(); const d = window.devicePixelRatio || 1; const w = Math.max(200, Math.round(r.width)); canvas.width = w * d; canvas.height = w * d; return { w, d }; };
+  let dim = size();
+  function draw() {
+    const { w, d } = dim; ctx.setTransform(d, 0, 0, d, 0, 0); ctx.clearRect(0, 0, w, w);
+    const cx = w / 2, R = w / 2 - 8, n = Math.max(1, list.length), seg = Math.PI * 2 / n;
+    ctx.save(); ctx.translate(cx, cx); ctx.rotate(rot);
+    for (let i = 0; i < n; i++) {
+      const col = list.length ? (list[i].color || WHEEL_COLORS[i % WHEEL_COLORS.length]) : '#d5d8df';
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, R, i * seg, (i + 1) * seg); ctx.closePath(); ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = '#1d1f27'; ctx.lineWidth = 2; ctx.stroke();
+      if (!list.length) continue;
+      ctx.save(); ctx.rotate(i * seg + seg / 2); ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      const light = ['#efe2c8', '#c69b4f', '#c47f12'].includes(col); ctx.fillStyle = light ? '#1d1f27' : '#fff';
+      let fs = Math.min(22, Math.max(11, w / 18)); if (n > 12) fs *= .8; if (n > 20) fs = Math.min(fs, Math.max(10, R * Math.sin(seg / 2) * 1.5)); ctx.font = `800 ${fs}px "Baloo 2", "Trebuchet MS", sans-serif`;
+      let t = list[i].label; const maxW = R - 14 - w * .11 - 8; while (ctx.measureText(t).width > maxW && t.length > 3) t = t.slice(0, -2) + '…';
+      ctx.fillText(t, R - 14, 0); ctx.restore();
+    }
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(cx, cx, R, 0, Math.PI * 2); ctx.lineWidth = 8; ctx.strokeStyle = '#1d1f27'; ctx.stroke();
+    for (let i = 0; i < 24; i++) { const a = i / 24 * Math.PI * 2; ctx.beginPath(); ctx.arc(cx + Math.cos(a) * R, cx + Math.sin(a) * R, 3, 0, Math.PI * 2); ctx.fillStyle = i % 2 ? '#ecd296' : '#fff'; ctx.fill(); }
+    ctx.beginPath(); ctx.arc(cx, cx, w * .09, 0, Math.PI * 2); ctx.fillStyle = '#f1e4c9'; ctx.fill(); ctx.lineWidth = 4; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cx, w * .035, 0, Math.PI * 2); ctx.fillStyle = '#c69b4f'; ctx.fill();
+  }
+  function spin(cb) {
+    if (spinning || !list.length) return; spinning = true;
+    const n = list.length, seg = Math.PI * 2 / n, idx = Math.floor(Math.random() * n);
+    const target = -Math.PI / 2 - (idx * seg + seg / 2) + (Math.random() - .5) * seg * .6;
+    const base = rot - (rot % (Math.PI * 2)); let end = base + target; while (end < rot + Math.PI * 2 * 5) end += Math.PI * 2;
+    const start = rot, dur = reduced ? 600 : 4200 + Math.random() * 800, t0 = performance.now(); let lastSeg = -1;
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 4); rot = start + (end - start) * e; draw();
+      const cur = Math.floor((((-Math.PI / 2 - rot) % (Math.PI * 2)) + Math.PI * 4) % (Math.PI * 2) / seg); if (cur !== lastSeg) { lastSeg = cur; SND.tick(); }
+      if (p < 1) requestAnimationFrame(step); else { spinning = false; SND.horn(); cb && cb(list[idx], idx); }
+    };
+    requestAnimationFrame(step);
+  }
+  draw();
+  const ro = new ResizeObserver(() => { dim = size(); draw(); }); ro.observe(canvas);
+  return { spin, set(items) { list = items.slice(); draw(); }, get spinning() { return spinning; }, destroy() { ro.disconnect(); } };
+}
+function wheelBlock(id) { return `<div class="wheel-box"><div class="wheel-pointer" aria-hidden="true"></div><canvas id="${id}" class="wheel-cv" aria-label="Roata alegerilor"></canvas></div>`; }
+
+/* ---------- Ecrane ---------- */
+let G = null; let raf = 0;
+function go(screen, arg) {
+  cancelAnimationFrame(raf); G = null; $$('.overlay').forEach(o => o.remove()); document.onkeydown = null;
+  window.scrollTo(0, 0);
+  ({ home: viewHome, play: startSolo, team: startTeam, rules: viewRules, garage: viewGarage, wheel: viewWheel, groups: viewGroups })[screen](arg);
+}
+function footer() { return `<footer class="footer wrap">Raliul Operațiilor · joc de matematică pentru ordinea efectuării operațiilor - învățător Vasile GHINESCU</footer>`; }
+function viewHome() {
+  const car = myCar(); const R = S.range;
+  $('#app').innerHTML = `
+  <section class="hero wrap"><div class="hero-grid">
+    <div>
+      <span class="plate" style="font-size:18px">ORDINEA OPERAȚIILOR</span>
+      <h1 style="margin-top:14px">Raliul Operațiilor<span>Câștigă cursa cu matematica!</span></h1>
+      <p class="lead">Mașina înaintează la fiecare calcul făcut în ordinea corectă. Atinge semnul operației care se face prima, apoi alege rezultatul.</p>
+      <div class="row"><button class="btn btn-go" id="go-first">${ICON.play}Pornește cursa</button><button class="btn" data-go="wheel">${ICON.wheel}Roata alegerilor</button></div>
+    </div>
+    <div class="hero-car"><div class="driving">${carSVG(car)}</div><div class="road-strip"></div></div>
+  </div></section>
+  <section class="wrap">
+    <div class="settings">
+      <div class="setting"><span class="lbl">Cum lucrăm?</span><div class="seg big" role="group" aria-label="Mod de lucru">
+        <button data-play="solo" aria-pressed="${S.play === 'solo'}">${ICON.user}Individual</button><button data-play="pair" aria-pressed="${S.play === 'pair'}">${ICON.pair}În pereche</button><button data-play="group" aria-pressed="${S.play === 'group'}">${ICON.group}Pe grupe</button></div></div>
+      <div class="setting"><span class="lbl">Numere până la</span><div class="seg" role="group" aria-label="Numere până la">${[100, 1000, 10000].map(r => `<button data-range="${r}" aria-pressed="${R === r}">${fmt(r)}</button>`).join('')}</div></div>
+      <div class="setting" ${S.play !== 'solo' ? 'hidden' : ''}><span class="lbl">Cursa</span><div class="seg" role="group" aria-label="Felul cursei"><button data-mode="race" aria-pressed="${S.mode === 'race'}">Cu adversar</button><button data-mode="calm" aria-pressed="${S.mode === 'calm'}">Fără grabă</button></div></div>
+    </div>
+    ${S.play === 'group' ? `<div class="gprev">${S.groups.length >= 2 ? S.groups.map((g, i) => `<span class="gp" style="--c:${TEAM_CARS[i].chip}"><b>${esc(g.name)}</b> · ${g.members.length} elevi</span>`).join('') : `<span class="muted">Grupele se formează automat din lista celor ${studentList().length} elevi când alegi etapa.</span>`}<button class="btn btn-sm" data-go="groups">${ICON.group}Vezi elevii din grupe</button></div>` : ''}
+    <div class="section-h"><h2>Alege etapa</h2></div>
+    <div class="stages">${LEVELS.map((L, i) => { const st = S.stars[starKey(i)] || 0; return `<button class="stage" data-level="${i}">
+      <div class="top"><span class="plate">ETAPA ${i + 1}</span><span class="spacer"></span>${S.play === 'solo' ? `<span class="stars" aria-label="${st} stele din 3">${[0, 1, 2].map(k => STAR(k < st)).join('')}</span>` : `<span class="chipinfo">${S.play === 'pair' ? '2 jucători' : (S.groups.length >= 2 ? S.groups.length : S.teams.length) + ' echipe'}</span>`}</div>
+      <h3>${esc(L.name)}</h3><p>${esc(L.desc)}</p><span class="ex">${esc(L.ex[R])}</span></button>`; }).join('')}</div>
+    <div class="cards3">
+      <button class="bigcard" data-go="groups"><span class="ic">${ICON.group}</span><span><h3>Grupele clasei${S.groups.length ? ' · ' + S.groups.length : ''}</h3><p>Formează grupe de câte 4–6 elevi din lista clasei și folosește-le în cursă.</p></span></button>
+      <button class="bigcard" data-go="rules"><span class="ic">${ICON.book}</span><span><h3>Regulile drumului</h3><p>Paranteze, banda rapidă și drumul de la stânga la dreapta, cu exemplu pas cu pas.</p></span></button>
+      <button class="bigcard" data-go="wheel"><span class="ic">${ICON.wheel}</span><span><h3>Roata alegerilor</h3><p>Alege la întâmplare elevul, echipa sau provocarea.</p></span></button>
+      <button class="bigcard" data-go="garage"><span class="ic">${ICON.garage}</span><span><h3>Garajul · ${totalStars()} ${totalStars() === 1 ? 'stea' : 'stele'}</h3><p>Strânge stele și deblochează mașini de epocă.</p></span></button>
+    </div>
+  </section>${footer()}`;
+  const startLevel = i => S.play === 'solo' ? go('play', i) : teamSetup(i);
+  $('#go-first').onclick = () => { const i = LEVELS.findIndex((_, k) => !S.stars[starKey(k)]); startLevel(S.play === 'solo' ? (i < 0 ? 0 : i) : 0); };
+  $$('[data-level]').forEach(b => b.onclick = () => startLevel(+b.dataset.level));
+  $$('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+  $$('[data-mode]').forEach(b => b.onclick = () => { S.mode = b.dataset.mode; save(); viewHome(); SND.pick(); });
+  $$('[data-range]').forEach(b => b.onclick = () => { S.range = +b.dataset.range; save(); viewHome(); SND.pick(); });
+  $$('[data-play]').forEach(b => b.onclick = () => { S.play = b.dataset.play; save(); viewHome(); SND.pick(); });
+}
+
+/* ---------- Pista (comună) ---------- */
+function trackLeft(p) { return `calc(1% + (94% - var(--cw)) * ${Math.max(0, Math.min(1, p)).toFixed(4)})`; }
+function trackHTML(racers, posts = '') {
+  const lanes = racers.length; let lines = ''; for (let i = 1; i < lanes; i++) lines += `<div class="lane-line" style="top:${40 + i * 62}px"></div>`;
+  return `<div class="track" id="track" style="--lanes:${lanes}">${lines}${posts}<div class="finish"></div><div class="flagpole"></div><div class="flag"></div>
+    ${racers.map((r, i) => `<div class="racer" id="${r.id}" style="top:${48 + i * 62}px;left:${trackLeft(r.p || 0)}"><span class="tag" ${r.chip ? `style="border-color:${r.chip}"` : ''}>${esc(r.label)}</span>${carSVG(r.car)}</div>`).join('')}</div>`;
+}
+function drive(el, p) { if (!el) return; el.style.left = trackLeft(p); el.classList.add('driving'); const pf = document.createElement('span'); pf.className = 'puff'; el.appendChild(pf); setTimeout(() => pf.remove(), 900); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('driving'), 900); }
+function sputter(el) { if (!el) return; el.classList.remove('sputter'); void el.offsetWidth; el.classList.add('sputter'); }
+
+/* ---------- Tabla cu exercițiul (comună) ---------- */
+function boardHTML() {
+  return `<div class="board">
+      <div class="prompt" id="prompt"></div>
+      <div class="expr" id="expr" aria-live="polite"></div>
+      <div class="answers" id="answers" hidden></div>
+      <div class="tools"><button class="btn btn-sm" id="hint">${ICON.bulb}Indiciu</button></div>
+      <div class="mech" id="mech">${MECH}<div><b>Mecanicul spune</b><p id="mech-t">Atinge semnul operației care se face prima.</p></div></div>
+    </div>`;
+}
+/* E = starea exercițiului curent; hooks: onStep(curat), onDone(), label() */
+function setupBoard(E) {
+  $('#hint').onclick = () => giveHint(E);
+  document.onkeydown = e => { if (E.state !== 'ans') return; const k = +e.key; if (k >= 1 && k <= 4) { const b = $$('#answers .ans')[k - 1]; b && !b.disabled && b.click(); } };
+  E.state = 'op'; E.sel = null; E.wrongTaps = 0; E.stepClean = true;
+  renderExpr(E); updatePrompt(E); setMech('', 'Atinge semnul operației care se face prima.');
+}
+function renderExpr(E, opts = {}) {
+  const tk = E.tk; let h = ''; const sel = E.sel;
+  tk.forEach((t, i) => {
+    if (sel !== null && i === sel - 1) h += '<span class="selg">';
+    if (t.k === 'n') h += `<span class="tk n${t.fresh ? ' fresh' : ''}">${fmt(t.v)}</span>`;
+    else if (t.k === 'o') h += `<button class="op" data-i="${i}" ${E.state !== 'op' ? 'disabled' : ''} aria-label="${t.v === ':' ? 'împărțire' : t.v === '×' ? 'înmulțire' : t.v === '+' ? 'adunare' : 'scădere'}">${t.v}</button>`;
+    else h += `<span class="tk br${opts.fade && opts.fade.includes(i) ? ' fade' : ''}">${t.k}</span>`;
+    if (sel !== null && i === sel + 1) h += '</span>';
+  });
+  if (opts.done) h += `<span class="tk result-line">&nbsp;= ${fmt(tk[0].v)}</span>`;
+  $('#expr').innerHTML = h; tk.forEach(t => delete t.fresh);
+  $$('#expr button.op').forEach(b => b.onclick = () => tapOp(E, +b.dataset.i, b));
+}
+function updatePrompt(E) {
+  const p = $('#prompt'); const lab = E.label();
+  if (E.state === 'op') p.innerHTML = `${lab}<span>Ce operație faci prima?</span>`;
+  else if (E.state === 'ans') { const t = E.tk; p.innerHTML = `${lab}<span>Cât face ${fmt(t[E.sel - 1].v)} ${t[E.sel].v} ${fmt(t[E.sel + 1].v)}?</span>`; }
+}
+function setMech(kind, text) { const m = $('#mech'); if (!m) return; m.className = 'mech' + (kind ? ' ' + kind : ''); $('#mech-t').textContent = text; }
+function tapOp(E, i, btn) {
+  if (E.state !== 'op') return;
+  const valid = nextOps(E.tk);
+  if (valid.includes(i)) {
+    SND.pick(); E.state = 'ans'; E.sel = i; E.wrongTaps = 0;
+    const [a, op, b] = [E.tk[i - 1].v, E.tk[i].v, E.tk[i + 1].v]; E.ans = calc(a, op, b);
+    renderExpr(E); updatePrompt(E);
+    setMech('good', pick(['Corect! Asta se face prima.', 'Bravo, ai ales bine!', 'Exact! Acum calculează.']));
+    const box = $('#answers'); box.hidden = false;
+    box.innerHTML = options(a, op, b, E.ans).map(v => `<button class="ans" data-v="${v}" aria-label="Răspunsul ${fmt(v)}">${fmt(v)}</button>`).join('');
+    $$('.ans', box).forEach(bt => bt.onclick = () => tapAns(E, +bt.dataset.v, bt));
+  } else {
+    E.stepClean = false; E.onMistake(); E.wrongTaps++; SND.bad();
+    btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong'); sputter(E.carEl());
+    setMech('bad', whyWrong(E.tk, i));
+    if (E.wrongTaps >= 2) $$('#expr button.op').forEach(b => { if (valid.includes(+b.dataset.i)) b.classList.add('hint'); });
+  }
+}
+async function tapAns(E, v, bt) {
+  if (E.state !== 'ans') return;
+  if (v !== E.ans) {
+    E.stepClean = false; E.onMistake(); SND.bad(); bt.classList.add('wrong'); bt.disabled = true; sputter(E.carEl());
+    const t = E.tk; setMech('bad', 'Mai încearcă! ' + calcTip(t[E.sel - 1].v, t[E.sel].v, t[E.sel + 1].v)); return;
+  }
+  E.state = 'anim'; SND.ok(); bt.classList.add('right'); $$('#answers .ans').forEach(x => x.disabled = true);
+  await sleep(350);
+  applyOp(E.tk, E.sel); E.sel = null; E.onStep(E.stepClean); E.stepClean = true;
+  $('#answers').hidden = true; renderExpr(E);
+  const col = collapsible(E.tk);
+  if (col.length) { await sleep(550); const f = []; col.forEach(i => f.push(i, i + 2)); renderExpr(E, { fade: f }); setMech('good', 'Paranteza s-a terminat, așa că dispare!'); await sleep(450); collapse(E.tk); renderExpr(E); }
+  if (!E.alive()) return;
+  if (E.tk.length === 1) {
+    renderExpr(E, { done: true }); setMech('good', pick(['Exercițiu terminat!', 'Super! Rezultatul final e gata.', 'Foarte bine!']));
+    await sleep(1200); if (!E.alive()) return;
+    return E.onDone();
+  }
+  E.state = 'op'; E.wrongTaps = 0; renderExpr(E); updatePrompt(E);
+  setMech('', 'Ce operație faci acum? Atinge semnul ei.');
+}
+function giveHint(E) {
+  if (!E.alive()) return; E.onHint(); SND.pick();
+  if (E.state === 'op') {
+    const valid = nextOps(E.tk); const hasBr = E.tk.some(t => t.k === '('); const anyMD = valid.some(i => isMD(E.tk[i].v));
+    $$('#expr button.op').forEach(b => { if (valid.includes(+b.dataset.i)) b.classList.add('hint'); });
+    setMech('', hasBr ? 'Uită-te în paranteză. Acolo începem.' : anyMD ? 'Caută înmulțirea sau împărțirea. Ele trec primele.' : 'Avem doar adunări și scăderi, deci pornim din stânga.');
+  } else if (E.state === 'ans') {
+    const wrong = $$('#answers .ans').filter(b => +b.dataset.v !== E.ans && !b.disabled); shuffle(wrong).slice(0, 2).forEach(b => { b.disabled = true; b.style.opacity = .35; });
+    setMech('', 'Am scos două răspunsuri greșite. Alege dintre cele rămase.');
+  }
+}
+
+/* ---------- Cursa individuală ---------- */
+const PER_RACE = 5;
+function startSolo(li) {
+  const L = LEVELS[li];
+  const exprs = []; const seen = new Set();
+  while (exprs.length < PER_RACE) { const e = gen(L); const key = exprText(e.tk); if (seen.has(key) && seen.size < 40) continue; seen.add(key); exprs.push(e); }
+  const totalSteps = exprs.reduce((a, e) => a + e.steps, 0);
+  G = { li, L, exprs, ei: 0, stepsDone: 0, totalSteps, mistakes: 0, hints: 0, rival: 0, rivalWon: false, t0: performance.now(), last: performance.now(), finished: false };
+  const car = myCar(); const race = S.mode === 'race';
+  let posts = ''; let acc = 0; for (let k = 0; k < PER_RACE - 1; k++) { acc += exprs[k].steps; posts += `<span class="post" data-post="${k}" style="left:calc(${trackLeft(acc / totalSteps).slice(5, -1)} + var(--cw) - 3px)"></span>`; }
+  const racers = race ? [{ id: 'rival', label: RIVAL.name, car: RIVAL, chip: RIVAL.body }, { id: 'me', label: 'Tu · ' + car.name, car }] : [{ id: 'me', label: 'Tu · ' + car.name, car }];
+  $('#app').innerHTML = `<div class="wrap play">
+    <div class="playhead"><button class="btn btn-sm" id="back">${ICON.back}Hartă</button><div class="title"><span class="plate">ETAPA ${li + 1}</span><h2>${esc(L.name)}</h2></div><span class="spacer"></span>
+      <span class="chipinfo">Până la ${fmt(S.range)}</span><span class="chipinfo" id="mist">Greșeli: 0</span><div class="dots" id="dots" aria-hidden="true">${exprs.map(() => '<i></i>').join('')}</div></div>
+    ${trackHTML(racers, posts)}${boardHTML()}</div>${footer()}`;
+  $('#back').onclick = () => go('home');
+  const myG = G;
+  const E = {
+    tk: cloneTk(exprs[0].tk),
+    label: () => `<span class="step">Exercițiul ${G.ei + 1} din ${PER_RACE}</span>`,
+    alive: () => G === myG && !G.finished,
+    carEl: () => $('#me'),
+    onMistake: () => { G.mistakes++; $('#mist').textContent = 'Greșeli: ' + G.mistakes; },
+    onHint: () => { G.hints++; },
+    onStep: () => { G.stepsDone++; drive($('#me'), G.stepsDone / G.totalSteps); },
+    onDone: () => {
+      const post = $(`[data-post="${G.ei}"]`); post && post.classList.add('done');
+      G.ei++; updateDots(); if (G.ei >= PER_RACE) return finishSolo();
+      E.tk = cloneTk(G.exprs[G.ei].tk); setupBoard(E);
+    }
+  };
+  const updateDots = () => $$('#dots i').forEach((d, i) => { d.className = i < G.ei ? 'done' : i === G.ei ? 'cur' : ''; });
+  updateDots(); setupBoard(E);
+  if (race) raf = requestAnimationFrame(tick);
+}
+function tick(now) {
+  if (!G || G.finished || G.team) return;
+  const dt = (now - G.last) / 1000; G.last = now;
+  if (!document.hidden && !G.rivalWon) {
+    G.rival = Math.min(1, G.rival + dt / (G.totalSteps * G.L.sec * (S.range === 10000 ? 1.5 : S.range === 1000 ? 1.25 : 1)));
+    const r = $('#rival'); if (r) { r.style.left = trackLeft(G.rival); r.classList.add('driving'); }
+    if (G.rival >= 1) { G.rivalWon = true; r && r.classList.remove('driving'); setMech('bad', 'Baronul Verde a trecut linia de sosire. Nu-i nimic, termină cursa! Contează să calculezi corect.'); SND.horn(); }
+  }
+  raf = requestAnimationFrame(tick);
+}
+function finishSolo() {
+  G.finished = true; cancelAnimationFrame(raf); const secs = Math.round((performance.now() - G.t0) / 1000);
+  const m = G.mistakes + G.hints * .5; let stars = m === 0 ? 3 : m <= 3 ? 2 : 1; if (S.mode === 'race' && G.rivalWon) stars = Math.max(1, stars - 1);
+  const before = totalStars(); const k = starKey(G.li); if (stars > (S.stars[k] || 0)) S.stars[k] = stars; save();
+  const unlocked = CARS.filter(c => c.need > before && c.need <= totalStars());
+  const won = S.mode === 'calm' || !G.rivalWon; const li = G.li;
+  SND.win(); setTimeout(SND.horn, 600); confetti();
+  const ov = overlay(`<span class="plate">ETAPA ${li + 1} · ${esc(LEVELS[li].name.toUpperCase())}</span>
+    <h2>${S.mode === 'calm' ? 'Ai ajuns la sosire!' : won ? 'Locul 1! Ai câștigat!' : 'Locul 2, foarte aproape!'}</h2>
+    <div class="bigstars">${[0, 1, 2].map(k => STAR(k < stars)).join('')}</div>
+    <div class="stats"><span class="chipinfo">${PER_RACE} exerciții</span><span class="chipinfo">Greșeli: ${G.mistakes}</span><span class="chipinfo">Indicii: ${G.hints}</span><span class="chipinfo">Timp: ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</span></div>
+    ${unlocked.length ? `<p class="unlock">Ai deblocat o mașină nouă în garaj: ${unlocked.map(c => esc(c.name)).join(', ')}!</p>` : ''}
+    <div class="fact">${carSVG(myCar())}<div><b>Știai că?</b><p>${esc(pick(FACTS))}</p></div></div>
+    <div class="row"><button class="btn" id="again">${ICON.redo}Mai joc o dată</button>${li < LEVELS.length - 1 ? `<button class="btn btn-go" id="next">Etapa următoare${ICON.next}</button>` : `<button class="btn btn-go" id="gar">${ICON.garage}Spre garaj</button>`}</div>
+    <button class="btn btn-sm" id="map">${ICON.back}Înapoi la hartă</button>`);
+  $('#again', ov).onclick = () => go('play', li);
+  const nx = $('#next', ov); if (nx) nx.onclick = () => go('play', li + 1);
+  const gr = $('#gar', ov); if (gr) gr.onclick = () => go('garage');
+  $('#map', ov).onclick = () => go('home');
+}
+const FACTS = [
+  'În anii 1930, unele mașini de lux aveau motoare cu 12 sau chiar 16 cilindri. Mașinile obișnuite de azi au de obicei 4.',
+  'O mașină de lux din 1931 cântărea cam 2.400 kg, aproape cât două mașini mici de azi.',
+  'Cutia de viteze avea doar 3 trepte. Multe mașini de azi au 6 sau mai multe.',
+  'Cele mai rapide mașini de lux din acea vreme ajungeau la aproximativ 160 km/h.',
+  'Anvelopele cu flancuri albe erau semnul unei mașini elegante.',
+  'Pe capota multor mașini de epocă stătea o mică statuetă din metal, numită ornament de radiator.',
+  'Roata de rezervă stătea adesea la vedere, prinsă în aripa din față.',
+  'Farurile mari și rotunde erau făcute din metal cromat și sticlă groasă.'
+];
+
+/* ---------- În pereche și pe grupe ---------- */
+function teamSetup(li) {
+  const pair = S.play === 'pair'; const canG = !pair && studentList().length >= 4; let useG = canG && (S.useGroups || !S.groups.length); if (useG && S.groups.length < 2) { S.groups = makeGroups(S.groupSize).groups; S.useGroups = true; save(); } let names = pair ? S.pair.slice(0, 2) : useG ? S.groups.map(g => g.name) : S.teams.slice(0, MAX_TEAMS); if (!pair && names.length < 2) names = TEAM_NAMES.slice(0, 4);
+  const ov = overlay(`<span class="plate">ETAPA ${li + 1} · ${esc(LEVELS[li].name.toUpperCase())}</span>
+    <h2>${pair ? 'Lucru în pereche' : 'Lucru pe grupe'}</h2>
+    <p class="muted">${pair ? 'Doi jucători, fiecare cu mașina lui. Rezolvă pe rând câte un exercițiu.' : 'Fiecare echipă are o mașină. Echipele rezolvă pe rând câte un exercițiu.'} Primiți câte 1 punct pentru operația aleasă corect din prima și 1 punct pentru rezultatul corect din prima.</p>
+    ${canG ? `<label class="check"><input type="checkbox" id="ts-g" ${useG ? 'checked' : ''}> Folosesc elevii din lista clasei (${studentList().length} elevi), împărțiți în grupe</label>
+      <div class="field" id="ts-gs" ${useG ? '' : 'hidden'}><span class="lbl">Câți elevi într-o grupă?</span><div class="row" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><div class="seg" id="ts-size">${[4, 5, 6].map(n => `<button data-s="${n}" aria-pressed="${S.groupSize === n}">câte ${n}</button>`).join('')}</div><button class="btn btn-sm" id="ts-redraw">${ICON.redo}Trage din nou la sorți</button></div></div>` : ''}
+    ${pair ? '' : `<div class="field" id="ts-nf" ${useG ? 'hidden' : ''}><span class="lbl">Număr de echipe</span><div class="seg" id="ts-n">${[2, 3, 4, 5, 6].map(n => `<button data-n="${n}" aria-pressed="${names.length === n}">${n}</button>`).join('')}</div></div>`}
+    <div class="names" id="ts-names"></div>
+    <div class="field"><span class="lbl">Exerciții pentru fiecare</span><div class="seg" id="ts-r">${[2, 3, 4, 5].map(n => `<button data-r="${n}" aria-pressed="${S.rounds === n}">${n}</button>`).join('')}</div></div>
+    <label class="check"><input type="checkbox" id="ts-w" ${S.useWheel ? 'checked' : ''}> Roata alegerilor decide cine răspunde (în fiecare tură, fiecare ${pair ? 'jucător' : 'echipă'} vine o singură dată)</label>
+    <div class="row"><button class="btn" id="ts-x">Renunță</button><button class="btn btn-go" id="ts-go">${ICON.play}Pornim cursa</button></div>`, 'wide');
+  const drawNames = () => {
+    $('#ts-names', ov).innerHTML = names.map((n, i) => `<label class="namefield"><span class="sw">${carSVG(TEAM_CARS[i])}</span><span class="nf-in"><input class="inp" id="tn-${i}" maxlength="24" value="${esc(n)}" aria-label="${pair ? 'Numele jucătorului' : 'Numele echipei'} ${i + 1}">${useG && S.groups[i] ? `<small>${S.groups[i].members.length} elevi: ${S.groups[i].members.map(shortName).map(esc).join(', ') || '…'}</small>` : ''}</span></label>`).join('');
+    $$('#ts-names input', ov).forEach((inp, i) => inp.oninput = () => { names[i] = inp.value; });
+  };
+  drawNames();
+  const tg = $('#ts-g', ov); if (tg) tg.onchange = () => { useG = tg.checked; if (useG && S.groups.length < 2) S.groups = makeGroups(S.groupSize).groups; names = useG ? S.groups.map(g => g.name) : S.teams.slice(0, 6); if (names.length < 2) names = TEAM_NAMES.slice(0, 4); $('#ts-nf', ov).hidden = useG; $('#ts-gs', ov).hidden = !useG; drawNames(); };
+  const redraw = async () => {
+    const r = makeGroups(S.groupSize); S.groups = r.groups.map(g => ({ name: g.name, members: [] })); names = S.groups.map(g => g.name); S.useGroups = true;
+    $('#ts-redraw', ov).disabled = true; drawNames();
+    for (const [nm, gi] of r.order) { if (!document.body.contains(ov)) return; S.groups[gi].members.push(nm); drawNames(); const el = $$('#ts-names .namefield', ov)[gi]; el && el.classList.remove('flash'), void (el && el.offsetWidth), el && el.classList.add('flash'); SND.tick(); await sleep(reduced ? 20 : 120); }
+    S.groups = r.groups; save(); $('#ts-redraw', ov).disabled = false; SND.pick();
+  };
+  const rd = $('#ts-redraw', ov); if (rd) rd.onclick = redraw;
+  $$('#ts-size [data-s]', ov).forEach(b => b.onclick = () => { S.groupSize = +b.dataset.s; $$('#ts-size [data-s]', ov).forEach(x => x.setAttribute('aria-pressed', x === b)); redraw(); });
+  $$('#ts-n [data-n]', ov).forEach(b => b.onclick = () => { const n = +b.dataset.n; while (names.length < n) names.push(TEAM_NAMES[names.length] || 'Echipa ' + (names.length + 1)); names = names.slice(0, n); $$('#ts-n [data-n]', ov).forEach(x => x.setAttribute('aria-pressed', x === b)); drawNames(); });
+  $$('#ts-r [data-r]', ov).forEach(b => b.onclick = () => { S.rounds = +b.dataset.r; $$('#ts-r [data-r]', ov).forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  $('#ts-x', ov).onclick = () => ov.remove();
+  $('#ts-go', ov).onclick = () => {
+    names = names.map((n, i) => n.trim() || (pair ? 'Jucătorul ' + (i + 1) : 'Echipa ' + (i + 1)));
+    if (pair) S.pair = names; else if (useG) { names.forEach((n, i) => S.groups[i].name = n); S.teams = names; } else S.teams = names; if (!pair) S.useGroups = useG; S.useWheel = $('#ts-w', ov).checked; save(); go('team', li);
+  };
+}
+function startTeam(li) {
+  const L = LEVELS[li]; const useG = S.play !== 'pair' && S.useGroups && S.groups.length >= 2; const names = S.play === 'pair' ? S.pair.slice(0, 2) : useG ? S.groups.map(g => g.name) : S.teams.slice(0, MAX_TEAMS);
+  const maxPts = S.rounds * (L.n - 1) * 2;
+  G = { team: true, li, L, players: names.map((n, i) => ({ name: n, members: useG ? S.groups[i].members : [], car: TEAM_CARS[i], chip: TEAM_CARS[i].chip, pts: 0, mistakes: 0, hints: 0, played: 0 })), round: 1, playedThisRound: [], cur: -1, maxPts, finished: false };
+  const myG = G;
+  $('#app').innerHTML = `<div class="wrap play">
+    <div class="playhead"><button class="btn btn-sm" id="back">${ICON.back}Hartă</button><div class="title"><span class="plate">ETAPA ${li + 1}</span><h2>${esc(L.name)}</h2></div><span class="spacer"></span>
+      <span class="chipinfo">Până la ${fmt(S.range)}</span><span class="chipinfo" id="round">Tura 1 din ${S.rounds}</span></div>
+    <div class="turn" id="turn"></div>
+    ${trackHTML(G.players.map((p, i) => ({ id: 'car' + i, label: p.name, car: p.car, chip: p.chip })))}
+    <div class="score" id="score"></div>
+    ${boardHTML()}</div>${footer()}`;
+  $('#back').onclick = () => go('home');
+  const E = {
+    tk: [T('n', 0)],
+    label: () => `<span class="step" style="background:${G.players[G.cur].chip}">${esc(G.players[G.cur].name)}</span>`,
+    alive: () => G === myG && !G.finished,
+    carEl: () => $('#car' + G.cur),
+    onMistake: () => { G.players[G.cur].mistakes++; drawScore(); },
+    onHint: () => { G.players[G.cur].hints++; },
+    onStep: clean => { const p = G.players[G.cur]; p.pts += clean ? 2 : 1; drive($('#car' + G.cur), p.pts / G.maxPts); drawScore(); },
+    onDone: () => { G.players[G.cur].played++; G.playedThisRound.push(G.cur); nextTurn(); }
+  };
+  // punctaj: 2 puncte pe pas fără greșeli, 1 punct dacă a greșit înainte să găsească răspunsul
+  const drawScore = () => {
+    const best = Math.max(...G.players.map(p => p.pts));
+    $('#score').innerHTML = G.players.map((p, i) => `<div class="sc ${i === G.cur ? 'cur' : ''}" style="--c:${p.chip}"><span class="dot"></span><b>${esc(p.name)}</b><span class="pts">${p.pts} p</span>${p.pts === best && best > 0 ? '<span class="lead">în frunte</span>' : ''}</div>`).join('');
+  };
+  function nextTurn() {
+    if (G.playedThisRound.length === G.players.length) { G.round++; G.playedThisRound = []; if (G.round > S.rounds) return finishTeam(); }
+    $('#round').textContent = `Tura ${G.round} din ${S.rounds}`;
+    const left = G.players.map((p, i) => i).filter(i => !G.playedThisRound.includes(i));
+    $('#expr').innerHTML = ''; $('#answers').hidden = true; $('#prompt').innerHTML = '';
+    setMech('', 'Pregătiți-vă! Urmează ' + (left.length === 1 ? G.players[left[0]].name : 'o nouă tură') + '.');
+    const begin = idx => {
+      G.cur = idx; drawScore();
+      const p = G.players[idx];
+      $('#turn').innerHTML = `<span class="tcar">${carSVG(p.car)}</span><span>Rândul ${S.play === 'pair' ? 'lui' : 'echipei'} <b style="color:${p.chip}">${esc(p.name)}</b>${p.members.length ? `<small class="mem">${p.members.map(shortName).map(esc).join(' · ')}</small>` : ''}</span>`;
+      const ov = overlay(`<span class="plate">TURA ${G.round} DIN ${S.rounds}</span><div class="turn-car">${carSVG(p.car)}</div><h2>Rândul ${S.play === 'pair' ? 'lui' : 'echipei'}<br><span style="color:${p.chip}">${esc(p.name)}</span></h2>${p.members.length ? `<div class="memlist" id="tml">${p.members.map((m, k) => `<span data-k="${k}">${esc(m)}</span>`).join('')}</div><button class="btn btn-sm" id="tpick">${ICON.wheel}Cine răspunde din grupă?</button>` : ''}<button class="btn btn-go" id="tg">${ICON.play}Începem!</button>`);
+      const tp = $('#tpick', ov); if (tp) tp.onclick = async () => { tp.disabled = true; const els = $$('#tml span', ov); const win = rnd(0, els.length - 1); const total = els.length * 3 + win; for (let k = 0; k <= total; k++) { els.forEach(e => e.classList.remove('on')); els[k % els.length].classList.add('on'); SND.tick(); await sleep(reduced ? 10 : 50 + k * 6); } SND.ok(); tp.disabled = false; };
+      $('#tg', ov).onclick = () => { ov.remove(); E.tk = cloneTk(gen(G.L).tk); setupBoard(E); };
+      setTimeout(() => $('#tg', ov) && $('#tg', ov).focus(), 50);
+    };
+    if (S.useWheel && left.length > 1) {
+      const ov = overlay(`<span class="plate">TURA ${G.round} DIN ${S.rounds}</span><h2>Cine răspunde acum?</h2>${wheelBlock('tw')}<p class="wres" id="twr" aria-live="polite">&nbsp;</p><button class="btn btn-go" id="tspin">${ICON.wheel}Învârte roata</button>`);
+      const w = makeWheel($('#tw', ov), left.map(i => ({ label: G.players[i].name, color: G.players[i].chip, i })));
+      $('#tspin', ov).onclick = () => { $('#tspin', ov).disabled = true; w.spin(it => { $('#twr', ov).innerHTML = `Răspunde: <b style="color:${it.color}">${esc(it.label)}</b>`; setTimeout(() => { w.destroy(); ov.remove(); begin(it.i); }, 1300); }); };
+    } else begin(left[0]);
+  }
+  drawScore(); nextTurn();
+}
+function finishTeam() {
+  G.finished = true; SND.win(); setTimeout(SND.horn, 600); confetti();
+  const ranked = G.players.map((p, i) => ({ ...p, i })).sort((a, b) => b.pts - a.pts || a.mistakes - b.mistakes);
+  let place = 0, prev = null; ranked.forEach((p, k) => { if (!prev || p.pts !== prev.pts || p.mistakes !== prev.mistakes) place = k + 1; p.place = place; prev = p; });
+  const li = G.li; const winners = ranked.filter(p => p.place === 1);
+  const ov = overlay(`<span class="plate">ETAPA ${li + 1} · ${esc(LEVELS[li].name.toUpperCase())}</span>
+    <h2>${winners.length > 1 ? 'Egalitate pe locul 1!' : `Câștigă ${esc(winners[0].name)}!`}</h2>
+    <ol class="podium">${ranked.map(p => `<li class="p${Math.min(p.place, 4)}"><span class="place">${p.place}</span><span class="pc">${carSVG(p.car)}</span><span class="pn"><b>${esc(p.name)}</b><small>${p.mistakes} ${p.mistakes === 1 ? 'greșeală' : 'greșeli'} · ${p.hints} ${p.hints === 1 ? 'indiciu' : 'indicii'}</small></span><span class="pp">${p.pts}<small> / ${G.maxPts} p</small></span></li>`).join('')}</ol>
+    <p class="muted small">La punctaj egal, câștigă cine a greșit mai puțin.</p>
+    <div class="row"><button class="btn" id="again">${ICON.redo}Încă o cursă</button>${li < LEVELS.length - 1 ? `<button class="btn btn-go" id="next">Etapa următoare${ICON.next}</button>` : ''}</div>
+    <button class="btn btn-sm" id="map">${ICON.back}Înapoi la hartă</button>`, 'wide');
+  $('#again', ov).onclick = () => go('team', li);
+  const nx = $('#next', ov); if (nx) nx.onclick = () => go('team', li + 1);
+  $('#map', ov).onclick = () => go('home');
+}
+
+/* ---------- Roata alegerilor (ecran) ---------- */
+const CHALLENGES = [
+  { label: 'Drum drept (+ −)', level: 0 }, { label: 'Banda rapidă (× :)', level: 1 }, { label: 'Curbe strânse', level: 2 },
+  { label: 'Garajul ( )', level: 3 }, { label: 'Paranteza și × :', level: 4 }, { label: 'Marele Premiu', level: 5 },
+  { label: 'Răspunde toată clasa' }, { label: 'Alege tu un coleg' }
+];
+let WHEEL = null;
+function viewWheel() {
+  const preset = S.wheelPreset;
+  $('#app').innerHTML = `<div class="wrap page">
+    <div><button class="btn btn-sm" id="back">${ICON.back}Înapoi</button></div>
+    <h1>Roata alegerilor</h1>
+    <div class="wheel-layout">
+      <div class="wheel-main">${wheelBlock('wcv')}<p class="wres big" id="wres" aria-live="polite">Apasă „Învârte roata”.</p>
+        <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button class="btn btn-go" id="wspin">${ICON.wheel}Învârte roata</button><button class="btn" id="wplay" hidden>${ICON.play}Joacă etapa</button></div></div>
+      <div class="wheel-side">
+        <div class="field"><span class="lbl">Ce alege roata?</span><div class="seg" id="wp">
+          <button data-p="students" aria-pressed="${preset === 'students'}">Elevii</button><button data-p="teams" aria-pressed="${preset === 'teams'}">Echipele</button><button data-p="chal" aria-pressed="${preset === 'chal'}">Provocările</button></div></div>
+        <label class="fl" id="wst" ${preset === 'students' ? '' : 'hidden'}>Numele elevilor (${S.students.split(/\r?\n/).filter(s => s.trim()).length}), câte unul pe rând<textarea class="inp" id="wnames" rows="9" placeholder="Ana\nMihai\nIoana\n…">${esc(S.students)}</textarea></label>
+        <label class="fl" id="wtm" ${preset === 'teams' ? '' : 'hidden'}>Numele echipelor, câte unul pe rând<textarea class="inp" id="wteams" rows="6">${esc(S.teams.join('\n'))}</textarea></label>
+        <label class="check"><input type="checkbox" id="wrm" checked> Scoate de pe roată ce a fost ales (fiecare vine o singură dată)</label>
+        <div class="row" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-sm" id="wreset">${ICON.redo}Pune-i pe toți înapoi</button>${S.wheelPreset === 'students' ? `<button class="btn btn-sm" id="wdef">Lista clasei</button>` : ''}</div>
+        <div><span class="lbl">Aleși până acum</span><ol class="hist" id="whist"></ol></div>
+      </div>
+    </div></div>${footer()}`;
+  $('#back').onclick = () => { WHEEL && WHEEL.destroy(); go('home'); };
+  let pool = []; const hist = [];
+  const source = () => {
+    if (S.wheelPreset === 'students') return S.students.split(/\r?\n/).map(s => s.replace(/^\s*\d+[.)]\s*/, '').trim()).filter(Boolean).map(l => { const w = l.split(/\s+/); return { label: w.length > 2 ? w[0] + ' ' + w[1] : l, full: l }; });
+    if (S.wheelPreset === 'teams') return (S.useGroups && S.groups.length >= 2 ? S.groups.map(g => g.name) : S.teams).map((t, i) => ({ label: t, color: TEAM_CARS[i % MAX_TEAMS].chip }));
+    return CHALLENGES.map(c => ({ ...c }));
+  };
+  const reset = () => { pool = source(); WHEEL.set(pool.length ? pool : [{ label: 'Adaugă nume' }]); $('#wres').textContent = pool.length ? 'Apasă „Învârte roata”.' : 'Scrie numele în listă, apoi învârte roata.'; $('#wplay').hidden = true; };
+  WHEEL && WHEEL.destroy(); WHEEL = makeWheel($('#wcv'), []); reset();
+  $$('#wp [data-p]').forEach(b => b.onclick = () => { S.wheelPreset = b.dataset.p; save(); viewWheel(); });
+  const nm = $('#wnames'); if (nm) nm.oninput = () => { S.students = nm.value; save(); reset(); };
+  const tm = $('#wteams'); if (tm) tm.oninput = () => { const l = tm.value.split(/\r?\n/).map(s => s.trim()).filter(Boolean); if (l.length) { S.teams = l.slice(0, 6); save(); reset(); } };
+  $('#wreset').onclick = () => { reset(); toast('Toți sunt din nou pe roată.'); };
+  const wd = $('#wdef'); if (wd) wd.onclick = () => { S.students = DEFAULT_STUDENTS; save(); viewWheel(); toast('Am pus înapoi lista clasei.'); };
+  $('#wspin').onclick = () => {
+    if (!pool.length || WHEEL.spinning) return; $('#wspin').disabled = true; $('#wplay').hidden = true; $('#wres').innerHTML = '&nbsp;';
+    WHEEL.spin((it, idx) => {
+      $('#wspin').disabled = false; $('#wres').innerHTML = `<b>${esc(it.full || it.label)}</b>`; hist.unshift(it.full || it.label);
+      $('#whist').innerHTML = hist.map(h => `<li>${esc(h)}</li>`).join('');
+      if (it.level !== undefined) { const p = $('#wplay'); p.hidden = false; p.onclick = () => { WHEEL.destroy(); S.play === 'solo' ? go('play', it.level) : (go('home'), teamSetup(it.level)); }; }
+      if ($('#wrm').checked) { pool.splice(idx, 1); setTimeout(() => WHEEL.set(pool.length ? pool : [{ label: 'Gata!' }]), 900); if (!pool.length) setTimeout(() => { $('#wres').innerHTML += '<br><small>Toți au fost aleși. Apasă „Pune-i pe toți înapoi”.</small>'; }, 950); }
+      confetti();
+    });
+  };
+}
+
+/* ---------- Grupele clasei ---------- */
+const studentList = () => S.students.split(/\r?\n/).map(s => s.replace(/^\s*\d+[.)]\s*/, '').trim()).filter(Boolean);
+function shortName(n) { const w = n.split(/\s+/); return w.length > 2 ? w[0] + ' ' + w[1] : n; }
+/* Împarte elevii în grupe de câte „size” (4–6): grupele ies egale, cu cel mult un elev diferență */
+function groupSizes(N, size) {
+  if (N < 2) return [N];
+  let g = Math.max(1, Math.floor(N / size)); const r = N - g * size;
+  if (r > 0 && !(size < 6 && r <= g)) g++;
+  g = Math.min(g, MAX_TEAMS, N);
+  const base = Math.floor(N / g), extra = N % g; return Array.from({ length: g }, (_, i) => base + (i < extra ? 1 : 0));
+}
+function makeGroups(size) {
+  const names = shuffle(studentList()); const sizes = groupSizes(names.length, size);
+  const groups = sizes.map((n, i) => ({ name: TEAM_NAMES[i] || 'Grupa ' + (i + 1), members: [] })); const order = [];
+  let g = 0; for (const nm of names) { let tries = 0; while (groups[g].members.length >= sizes[g] && tries++ < groups.length) g = (g + 1) % groups.length; groups[g].members.push(nm); order.push([nm, g]); g = (g + 1) % groups.length; }
+  return { groups, order };
+}
+function viewGroups() {
+  const N = studentList().length; let sel = null; let anim = null; // anim = { shown, order, cur }
+  const draw = () => {
+    const sizes = groupSizes(N, S.groupSize);
+    $('#app').innerHTML = `<div class="wrap page">
+      <div><button class="btn btn-sm" id="back">${ICON.back}Înapoi</button></div>
+      <h1>Grupele clasei</h1>
+      <div class="settings">
+        <div class="setting"><span class="lbl">Elevi în listă</span><span class="chipinfo" style="font-size:18px">${N} elevi</span></div>
+        <div class="setting"><span class="lbl">Câți elevi într-o grupă?</span><div class="seg big" id="gs">${[4, 5, 6].map(n => `<button data-s="${n}" aria-pressed="${S.groupSize === n}">câte ${n}</button>`).join('')}</div></div>
+        <div class="setting"><span class="lbl">Vor ieși</span><span class="chipinfo" style="font-size:16px">${sizes.length} grupe · ${[...new Set(sizes)].sort().join(' sau ')} elevi</span></div>
+        <div class="setting"><button class="btn btn-go" id="gmake">${ICON.redo}${S.groups.length ? 'Formează din nou' : 'Formează grupele'}</button></div>
+      </div>
+      ${N < 4 ? '<p class="muted">Adaugă cel puțin 4 elevi în lista clasei (în Roata alegerilor → Elevii).</p>' : ''}
+      ${anim ? `<div class="draw-banner" aria-live="polite"><span class="lbl">Tragere la sorți · ${anim.i} din ${anim.order.length}</span><b>${anim.cur ? esc(anim.cur[0]) : '…'}</b>${anim.cur ? `<span class="to" style="background:${TEAM_CARS[anim.cur[1]].chip}">→ ${esc(S.groups[anim.cur[1]].name)}</span>` : ''}<button class="btn btn-sm" id="gskip">Arată tot</button></div>` : ''}
+      ${S.groups.length ? `<p class="muted">Elevii au fost împărțiți prin tragere la sorți. Ca să muți un elev, atinge-i numele, apoi atinge grupa în care vrei să meargă. Numele grupelor se pot schimba.</p>
+      <div class="groups">${S.groups.map((g, i) => `<div class="gcard" data-g="${i}" style="--c:${TEAM_CARS[i].chip}">
+        <div class="gh"><input class="inp" data-gn="${i}" maxlength="24" value="${esc(g.name)}" aria-label="Numele grupei ${i + 1}"><span class="cnt">${anim ? g.members.filter(m => anim.shownSet.has(m)).length : g.members.length}</span></div><span class="gcar-row">${carSVG(TEAM_CARS[i])}</span>
+        <ul>${(anim ? g.members.filter(m => anim.shownSet.has(m)) : g.members).map((m, k) => `<li><button class="mem-b ${sel && sel[0] === i && sel[1] === k ? 'sel' : ''}" data-m="${i}:${k}">${esc(m)}</button></li>`).join('')}</ul>
+        ${sel && sel[0] !== i ? `<button class="btn btn-sm movehere" data-to="${i}">Mută aici</button>` : ''}</div>`).join('')}</div>
+      <div class="row" style="display:flex;gap:12px;flex-wrap:wrap" ${anim ? 'hidden' : ''}>
+        <button class="btn btn-go" id="guse">${ICON.play}Pornește cursa cu aceste grupe</button>
+        <button class="btn" id="gwheel">${ICON.wheel}Roata cu grupele</button>
+        <button class="btn" id="gclear">Șterge grupele</button></div>` : `<div class="empty-g"><span class="ic">${ICON.group}</span><p>Alege câți elevi vrei într-o grupă și apasă „Formează grupele”.</p></div>`}
+    </div>${footer()}`;
+    $('#back').onclick = () => go('home');
+    $$('#gs [data-s]').forEach(b => b.onclick = () => { S.groupSize = +b.dataset.s; save(); SND.pick(); draw(); });
+    $('#gmake').onclick = async () => {
+      if (N < 4) return toast('Lista are prea puțini elevi.'); if (anim) return;
+      const r = makeGroups(S.groupSize); S.groups = r.groups; S.useGroups = true; save(); sel = null;
+      anim = { order: r.order, i: 0, cur: null, shownSet: new Set(), skip: false }; const a = anim; draw();
+      for (const pair of a.order) {
+        if (a.skip || anim !== a) break;
+        a.i++; a.cur = pair; draw(); SND.tick();
+        await sleep(reduced ? 60 : 650); if (a.skip || anim !== a) break;
+        a.shownSet.add(pair[0]); draw(); SND.pick();
+        const el = [...document.querySelectorAll('.gcard[data-g="' + pair[1] + '"] .mem-b')].pop(); if (el) el.classList.add('new');
+        await sleep(reduced ? 40 : 260);
+      }
+      if (anim === a) { anim = null; draw(); SND.horn(); confetti(); toast(`Gata! Am format ${S.groups.length} grupe.`); }
+    };
+    const gs = $('#gskip'); if (gs) gs.onclick = () => { anim.skip = true; anim = null; draw(); SND.horn(); toast(`Am format ${S.groups.length} grupe.`); };
+    $$('[data-gn]').forEach(inp => inp.oninput = () => { S.groups[+inp.dataset.gn].name = inp.value.trim() || 'Grupa ' + (+inp.dataset.gn + 1); save(); });
+    $$('[data-m]').forEach(b => b.onclick = () => { if (anim) return; const [g, k] = b.dataset.m.split(':').map(Number); sel = sel && sel[0] === g && sel[1] === k ? null : [g, k]; SND.pick(); draw(); });
+    $$('[data-to]').forEach(b => b.onclick = e => { e.stopPropagation(); moveTo(+b.dataset.to); });
+    $$('.gcard').forEach(c => c.onclick = e => { if (!sel || e.target.closest('input,button')) return; const to = +c.dataset.g; if (to !== sel[0]) moveTo(to); });
+    const gu = $('#guse'); if (gu) gu.onclick = () => { S.play = 'group'; S.useGroups = true; save(); go('home'); setTimeout(() => { const st = $('.stages'); st && st.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); toast('Alege etapa pentru cursa pe grupe.'); }, 80); };
+    const gw = $('#gwheel'); if (gw) gw.onclick = () => { S.useGroups = true; S.wheelPreset = 'teams'; save(); go('wheel'); };
+    const gc = $('#gclear'); if (gc) gc.onclick = () => { S.groups = []; S.useGroups = false; save(); sel = null; draw(); };
+  };
+  const moveTo = to => { const [g, k] = sel; const m = S.groups[g].members.splice(k, 1)[0]; S.groups[to].members.push(m); sel = null; S.groups = S.groups.filter(x => x.members.length); save(); SND.ok(); draw(); };
+  draw();
+}
+
+/* ---------- Regulile drumului ---------- */
+function viewRules() {
+  $('#app').innerHTML = `<div class="wrap page">
+    <div><button class="btn btn-sm" id="back">${ICON.back}Înapoi</button></div>
+    <h1>Regulile drumului</h1>
+    <div class="rules">
+      <div class="rule"><span class="sign">( )</span><div><h3>1. Garajul parantezelor</h3><p>Ce este în paranteze se face primul.</p><p class="ex">(1.200 + 300) × 4 = 1.500 × 4 = 6.000</p></div></div>
+      <div class="rule"><span class="sign blue">× :</span><div><h3>2. Banda rapidă</h3><p>Înmulțirea și împărțirea se fac înaintea adunării și scăderii.</p><p class="ex">2.000 + 300 × 4 = 2.000 + 1.200 = 3.200</p></div></div>
+      <div class="rule"><span class="sign tri">+ −</span><div><h3>3. Drumul obișnuit</h3><p>Adunarea și scăderea vin la urmă, după înmulțiri și împărțiri.</p><p class="ex">5.000 − 800 : 2 = 5.000 − 400 = 4.600</p></div></div>
+      <div class="rule"><span class="sign" style="border-color:var(--burgundy)">→</span><div><h3>4. De la stânga la dreapta</h3><p>Când operațiile sunt la fel de importante, le facem în ordine, ca atunci când citim.</p><p class="ex">1.200 : 4 × 2 = 300 × 2 = 600</p></div></div>
+    </div>
+    <div class="demo"><span class="plate cream">EXEMPLU PAS CU PAS</span><div class="expr" id="dexpr"></div><p class="note" id="dnote"></p>
+      <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button class="btn btn-go" id="dnext">Pasul următor${ICON.next}</button><button class="btn" id="dnew">${ICON.redo}Alt exemplu</button></div></div>
+    <div><button class="btn btn-go" id="toplay">${ICON.play}Hai la cursă!</button></div></div>${footer()}`;
+  $('#back').onclick = () => go('home'); $('#toplay').onclick = () => go('home');
+  const demos = [4, 5, 2, 3]; let tk, k = 0, pending = null;
+  const draw = (sel, done) => { $('#dexpr').innerHTML = tk.map((t, i) => (i === sel - 1 ? '<span class="selg">' : '') + (t.k === 'n' ? `<span class="tk n${t.fresh ? ' fresh' : ''}">${fmt(t.v)}</span>` : t.k === 'o' ? `<button class="op" disabled>${t.v}</button>` : `<span class="tk br">${t.k}</span>`) + (i === sel + 1 ? '</span>' : '')).join('') + (done ? `<span class="tk result-line">&nbsp;= ${fmt(tk[0].v)}</span>` : ''); tk.forEach(t => delete t.fresh); };
+  const set = () => { tk = cloneTk(gen(LEVELS[demos[k++ % demos.length]]).tk); pending = null; draw(null); $('#dnote').textContent = 'Apasă „Pasul următor” ca să vezi ce operație se face prima.'; $('#dnext').disabled = false; };
+  $('#dnext').onclick = () => {
+    if (tk.length === 1) return;
+    if (pending === null) {
+      const i = nextOps(tk)[0]; pending = i; draw(i); SND.pick();
+      const why = tk.some(t => t.k === '(') ? 'Întâi paranteza:' : isMD(tk[i].v) ? 'Înmulțirea și împărțirea trec primele:' : 'Au rămas adunări și scăderi, deci din stânga:';
+      $('#dnote').textContent = `${why} ${fmt(tk[i - 1].v)} ${tk[i].v} ${fmt(tk[i + 1].v)} = ${fmt(calc(tk[i - 1].v, tk[i].v, tk[i + 1].v))}`;
+    } else {
+      applyOp(tk, pending); collapse(tk); pending = null; const done = tk.length === 1; draw(null, done); SND.ok();
+      $('#dnote').textContent = done ? 'Gata! Acesta este rezultatul final.' : 'Apasă din nou pentru pasul următor.'; if (done) $('#dnext').disabled = true;
+    }
+  };
+  $('#dnew').onclick = set; set();
+}
+
+/* ---------- Garajul ---------- */
+function viewGarage() {
+  const ts = totalStars();
+  $('#app').innerHTML = `<div class="wrap page">
+    <div><button class="btn btn-sm" id="back">${ICON.back}Înapoi</button></div>
+    <h1>Garajul tău</h1><p style="font-size:19px;color:var(--muted)">Ai <b style="color:var(--ink)">${ts} ${ts === 1 ? 'stea' : 'stele'}</b>. Câștigă stele în cursele individuale ca să deblochezi mașini noi.</p>
+    <div class="garage">${CARS.map(c => { const open = ts >= c.need; return `<div class="gcar ${S.car === c.id ? 'sel' : ''}">
+      ${carSVG(c)}<h3>${esc(c.name)} <span class="plate" style="font-size:16px">${c.year}</span></h3>
+      <div class="specs">${c.specs.map(s => `<span>${esc(s)}</span>`).join('')}</div><p>${esc(c.fact)}</p>
+      ${open ? (S.car === c.id ? '<span class="chipinfo" style="align-self:flex-start">Mașina ta</span>' : `<button class="btn btn-sm btn-go" data-car="${c.id}" style="align-self:flex-start">Alege mașina</button>`) : ''}
+      ${open ? '' : `<div class="lock">${ICON.lock}<span>Se deblochează la ${c.need} stele</span><span style="font-weight:600;color:var(--muted)">Îți mai trebuie ${c.need - ts}</span></div>`}</div>`; }).join('')}</div></div>${footer()}`;
+  $('#back').onclick = () => go('home');
+  $$('[data-car]').forEach(b => b.onclick = () => { S.car = b.dataset.car; save(); SND.horn(); viewGarage(); toast('Mașina ta este acum ' + myCar().name + '!'); });
+}
+
+document.addEventListener('visibilitychange', () => { if (G) G.last = performance.now(); });
+go('home');
+
+</script>
+
+</body>
+</html>
